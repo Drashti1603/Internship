@@ -1,0 +1,2385 @@
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.alibaba.arouter")
+    id("com.google.dagger.hilt.android")
+    id("com.google.firebase.crashlytics")
+    id("com.google.firebase.firebase-perf")
+    id("com.google.gms.google-services")
+    id("com.mikepenz.aboutlibraries.plugin")
+    id("jacoco")
+    id("kotlin-parcelize")
+    id("org.jetbrains.kotlin.kapt")
+}
+
+configurations {
+    chuckerImplementation {}
+    alphaReleaseImplementation {}
+    betaReleaseImplementation {}
+    officialReleaseImplementation {}
+}
+
+Properties getBuildProperties(String propertyName) {
+    Properties properties = new Properties()
+    def file = project.rootProject.file(propertyName)
+    InputStream inputStream = file.newDataInputStream()
+    properties.load(inputStream)
+    inputStream.close()
+    return properties
+}
+
+private static Properties getPropertiesByPath(String dir, String configFileName) {
+
+    try {
+        Properties properties = new Properties()
+        def file = new File("${dir}/${configFileName}")
+        InputStream inputStream = file.newDataInputStream()
+        properties.load(inputStream)
+        inputStream.close()
+        return properties
+    } catch (Exception ignored) {
+        println("No such a file: ${dir}.${configFileName}, please set it up")
+    }
+}
+
+Set<String> pluginSet = new HashSet()
+project.getRootProject().getAllprojects().forEach(x -> {
+    pluginSet.add(x.getName())
+})
+
+/*
+* wyze_debug_build.properties is in version control system.
+* roku_smart_home_production_build.properties is not in version control system.
+* Properties for production release. If no roku_smart_home_production_build.properties set up, it will have an error "Password verification failed" for production release.
+*/
+
+Properties getWyzeProductionBuildProperties() {
+    Properties properties = new Properties()
+    def file = project.rootProject.file('roku_smart_home_production_build.properties')
+    if (!file.exists()) {
+        // Production keystore properties expected to be missing on dev machines, devs use the debug keystore properties
+        return getBuildProperties("wyze_release_build.properties")
+    }
+    InputStream inputStream = file.newDataInputStream()
+    properties.load(inputStream)
+    inputStream.close()
+    println("   production keystore has been set up...")
+    return properties
+}
+
+String getProductionKeystorePath() {
+    Properties properties = new Properties()
+    def fileKeyStore = project.rootProject.file('roku_smart_home_production_build.properties')
+    if (!fileKeyStore.exists()) {
+        // Production keystore path expected to be missing on dev machines, devs use the debug keystore path
+        return file(".").getAbsolutePath() + getBuildProperties("wyze_release_build.properties")['keystorePath']
+    }
+    InputStream inputStream = fileKeyStore.newDataInputStream()
+    properties.load(inputStream)
+    inputStream.close()
+    String keyStorePath = properties['keystorePath']
+    if (keyStorePath.charAt(0).toString() == ".") {
+        def keyStorePathRealPath = projectDir.getParent() + keyStorePath.substring(1)
+        return keyStorePathRealPath
+    } else {
+        return keyStorePath
+    }
+}
+
+def productionBuildProperties = getWyzeProductionBuildProperties()
+def productionKeystorePath = getProductionKeystorePath()
+def debugBuildProperties = getBuildProperties("wyze_debug_build.properties")
+def releaseBuildProperties = getBuildProperties("wyze_release_build.properties")
+def STRING_TEST_CODE_NAME_ALPHA = "\"Alpha Version\""
+def STRING_TEST_CODE_NAME_BETA = "\"Beta Version\""
+def STRING_TEST_CODE_NAME_OFFICIAL = "\"Official Version\""
+
+def STRING_SERVER_OFFICIAL = "\"Official\""
+
+def INT_VERSIONCODE = getVersionCode()
+def STRING_VERSION_NAME = getVersionName()
+def BUILD_ENV_VERSION_CODE = getVersionCode()
+
+def BRAZE_API_KEY_DEV = '"' + (System.getenv("BRAZE_KEY_OWL_ANDROID_DEV") ?: "") + '"'
+def BRAZE_API_KEY_PROD = '"' + (System.getenv("BRAZE_KEY_OWL_ANDROID_PROD") ?: "") + '"'
+
+String getVersionName() {
+    StringBuilder versionName = new StringBuilder()
+    versionName.append("\"")
+    versionName.append(project.ext["versionName"])
+    versionName.append("\"")
+    println("VersionName " + versionName)
+    println("project:" + project.getName())
+    return versionName.toString()
+}
+
+String getVersionCode() {
+    println("VersionCode " + project.ext["versionCode"])
+    return project.ext["versionCode"]
+}
+
+def appInfoProperties = getPropertiesByPath(project.projectDir.getAbsolutePath(), "build_app_info.properties")
+
+
+/*
+ * OwlAppSmarthomeAndroid --> owl-app-smarthome-android -> [owl, app, smarthome, android]
+ * Write a function to map camel string to a low case array
+ * */
+
+private static String[] getNameList(String currentProjectName) {
+    StringBuilder stringBuilder = new StringBuilder()
+    for (char c : currentProjectName.toCharArray()) {
+        char nc = Character.toLowerCase(c)
+        if (Character.isUpperCase(c)) {
+            if (stringBuilder.length() == 0) {
+                stringBuilder.append(nc)
+            } else {
+                stringBuilder.append('-').append(nc)
+            }
+        } else {
+            stringBuilder.append(nc)
+        }
+    }
+    return stringBuilder.toString().split("-")
+}
+
+private static String mapToApplicationId(String[] repoBreakDownArray) {
+    return "com." + repoBreakDownArray[0] + "." + repoBreakDownArray[1] + "." + repoBreakDownArray[2]
+}
+
+def APP_NAME = "Smart Home"
+
+private static String getApplicationId(Properties appInfoProperties, String repoName) {
+    def appId = mapToApplicationId(getNameList(repoName))
+    def applicationIdInProperty = appInfoProperties.getProperty("applicationId")
+    if (applicationIdInProperty == null || applicationIdInProperty.isEmpty()) {
+        println "getApplicationId-----> ${appId}"
+        return appId
+    } else {
+        println "getApplicationId-----> ${applicationIdInProperty}"
+        return applicationIdInProperty
+    }
+
+}
+
+def APP_ID = getApplicationId(appInfoProperties, project.getRootProject().getName())
+
+android {
+    namespace = "com.hualai"
+    compileSdk libs.versions.compileSdk.get().toInteger()
+
+    defaultConfig {
+        resValue "string", "app_name", "${APP_NAME}Beta"
+        buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+        buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_BETA)
+        buildConfigField "boolean", "isChangeServer", "true"
+        buildConfigField "boolean", "isChangeTestCode", "true"
+        buildConfigField "boolean", "isChangeChannel", "true"
+        buildConfigField("int", "VERSION_CODE", INT_VERSIONCODE)
+        buildConfigField("String", "VERSION_NAME", STRING_VERSION_NAME)
+        buildConfigField("String", "APPLICATION_ID", "\"" + "${APP_ID}" + "\"")
+        buildConfigField("String", "DEVELOP_INFO", '""')
+        buildConfigField("String", "VERSION_NAME_SUFFIX", '""')
+        buildConfigField("String", "OWL_BUILD_TPYE", '\"BUILD_TYPE_DEBUG\"')
+        applicationId APP_ID
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.targetSdk.get().toInteger()
+        versionCode project.ext["versionCode"]
+        versionName project.ext["versionName"]
+        signingConfig signingConfigs.debug
+        multiDexEnabled true
+        testInstrumentationRunner "com.roku.rokuhome.test.runner.CucumberTestRunner"
+        testBuildType System.getProperty("testBuildType", "debug")
+//        Enable the below line when using AndroidTestOrchestrator
+//        testInstrumentationRunnerArguments clearPackageData: 'true'
+//        adbOptions {
+//            installOptions '-g', '-r'
+//        }
+//        testOptions {
+//            execution 'ANDROIDX_TEST_ORCHESTRATOR'
+//        }
+        buildConfigField('boolean', 'ENABLE_REPORT_PORTAL', project.getProperties().get("reportPortal") ?: 'false')
+        buildConfigField('boolean', 'RUN_ON_DEVICE_FARM', run_on_device_farm())
+
+        /*
+        * specify output file name, fox example: Wyze-61560-2_24_1-release.aab or Wyze-61560-2_24_1-debug.apk
+        * '-release' is the build type.
+        * .apk is the file format, if we use bundle build, it will be .aab
+        * */
+        setProperty("archivesBaseName", "Roku-Smart-Home-" + versionCode + "-" + versionName.toString().replaceAll('\\.', '_'))
+
+        ndk {
+            abiFilters "arm64-v8a", "armeabi-v7a"
+        }
+        resConfigs 'en'
+
+        kapt {
+            arguments {
+                arg("AROUTER_MODULE_NAME", project.getName())
+            }
+        }
+    }
+
+    signingConfigs {
+
+        debug {
+            storeFile new File(file(".").getAbsolutePath() + debugBuildProperties['keystorePath']).getAbsoluteFile()
+            storePassword debugBuildProperties['storePassword']
+            keyAlias debugBuildProperties['keyAlias']
+            keyPassword debugBuildProperties['keyPassword']
+            v2SigningEnabled true
+        }
+
+        release {
+            storeFile new File(file(".").getAbsolutePath() + releaseBuildProperties['keystorePath']).getAbsoluteFile()
+            storePassword releaseBuildProperties['storePassword']
+            keyAlias releaseBuildProperties['keyAlias']
+            keyPassword releaseBuildProperties['keyPassword']
+            v2SigningEnabled true
+        }
+
+        productionRelease {
+            storeFile new File(productionKeystorePath).getAbsoluteFile()
+            storePassword productionBuildProperties['storePassword']
+            keyAlias productionBuildProperties['keyAlias']
+            keyPassword productionBuildProperties['keyPassword']
+            v2SigningEnabled true
+        }
+    }
+
+    buildTypes {
+        // Use these to selectively enable and disable startup actions with a manifestPlaceholders element
+        def startupItemEnabled = "androidx.startup"
+        def startupItemNotEnabled = ""
+
+        /*
+        * debug build: the only build that allows Charles to intercept app traffic.
+        * */
+        debug {
+            debuggable true
+            signingConfig signingConfigs.debug
+            versionNameSuffix ""
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\"\"")
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_DEV)
+
+            manifestPlaceholders.bugseeEnabled = startupItemEnabled
+            testCoverageEnabled = true
+        }
+
+        chucker {
+            initWith debug
+            signingConfig signingConfigs.debug
+            matchingFallbacks = ['debug']
+
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+        /*
+        * The following three build types are production release.
+        * production build: it's used by Google Play Store.
+        * signingConfig should be set up in 'roku_smart_home_production_build.properties' of the project root dir.
+        * */
+        alphaRelease {
+            debuggable false
+            initWith release
+            buildConfigField "boolean", "isChangeServer", "false"
+            buildConfigField "boolean", "isChangeTestCode", "false"
+            buildConfigField "boolean", "isChangeChannel", "false"
+            signingConfig signingConfigs.productionRelease
+            resValue "string", "app_name", "${APP_NAME}Alpha"
+            buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+            buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_ALPHA)
+            versionNameSuffix ".a${BUILD_ENV_VERSION_CODE}"
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\".a${BUILD_ENV_VERSION_CODE}\"")
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_PROD)
+            matchingFallbacks = ['release']
+
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+        betaRelease {
+            debuggable false
+            initWith release
+            buildConfigField "boolean", "isChangeServer", "false"
+            buildConfigField "boolean", "isChangeTestCode", "false"
+            buildConfigField "boolean", "isChangeChannel", "false"
+            signingConfig signingConfigs.productionRelease
+            resValue "string", "app_name", "${APP_NAME}Beta"
+            buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+
+            //Note: For beta release, the testCodeName is STRING_TEST_CODE_NAME_OFFICIAL！
+            buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_BETA)
+            versionNameSuffix ".b${BUILD_ENV_VERSION_CODE}"
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\".b${BUILD_ENV_VERSION_CODE}\"")
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_PROD)
+            matchingFallbacks = ['release']
+
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+        release {
+            debuggable false
+            initWith release
+            buildConfigField "boolean", "isChangeServer", "false"
+            buildConfigField "boolean", "isChangeTestCode", "false"
+            buildConfigField "boolean", "isChangeChannel", "false"
+            signingConfig signingConfigs.productionRelease
+            resValue "string", "app_name", "${APP_NAME}"
+            buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+            buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_OFFICIAL)
+            versionNameSuffix ".${BUILD_ENV_VERSION_CODE}"
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\".${BUILD_ENV_VERSION_CODE}\"")
+            matchingFallbacks = ['release']
+            buildConfigField("String", "OWL_BUILD_TPYE", '\"BUILD_TYPE_OFFICIAL_RELEASE\"')
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_PROD)
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+    }
+    packagingOptions {
+        jniLibs {
+            excludes += ['junit/runner/*', 'lib/armeabi-v7a/libaac_codec.so', 'lib/arm64-v8a/libpl_droidsonroids_gif.so', 'lib/armeabi-v7a/libpl_droidsonroids_gif.so', 'kotlin/**']
+            pickFirsts += ['lib/armeabi-v7a/libc++_shared.so', 'lib/arm64-v8a/libc++_shared.so', 'lib/armeabi-v7a/libmarsxlog.so', 'lib/arm64-v8a/libmarsxlog.so']
+        }
+        resources {
+            excludes += ['META-INF/CHANGES', 'META-INF/README.md', 'Grizzly_THIRDPARTYLICENSEREADME.txt', 'billing.properties', 'build-data.properties', 'LICENSE-junit.txt', 'junit/runner/*', 'META-INF/INDEX.LIST', 'builddef.lst', 'isoparser2-default.properties', 'version2.txt', 'places.properties', 'transport-*.properties', 'play-services-*.properties', 'META-INF/*.version', 'androidsupportmultidexversion.txt', 'firebase-*.properties', 'META-INF/*.kotlin_module', 'kotlin/**', 'META-INF/aop-ajc.xml']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    buildFeatures {
+        buildConfig = true
+        compose = true
+        dataBinding true
+        viewBinding true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.compose.kotlinCompilerVersion.get()
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+        disable 'InvalidPackage', 'Instantiatable'
+    }
+
+    preBuild.configure {
+        dependsOn installGitHook
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+configurations.configureEach {
+    resolutionStrategy {
+        force libs.junit
+    }
+}
+
+dependencies {
+    implementation(libs.bundles.androidx.compose)
+    implementation(libs.androidx.compose.activity)
+
+    // WPK
+    implementation project(":WyzeAndroidWpkAndroid")
+    implementation project(":WyzePluginEventAndroid")
+    implementation project(":WyzePluginRuleAndroid")
+
+    // hms
+    implementation project(":WyzePluginHmsAndroid")
+
+    // (Color bulb)
+    implementation project(":WyzePluginCommonlightAndroid")
+    implementation project(":HualaiPluginHlsdkAndroid")
+
+    // (Hualai setup plugin)
+    implementation project(":HualaiPluginSetupAndroid")
+
+    // (Hualai wifi plugin)
+    implementation project(":HualaiPluginWifiAndroid")
+
+    /*----------Hualai camera plugin bundle start----------*/
+
+    // (Hualai cam sdk)
+    implementation project(':TutkPluginSdkAndroid')
+
+    // camera group
+    implementation project(":HualaiPluginCamgroupAndroid")
+
+    // ( Wyze Outdoor Camera )
+    implementation project(":HualaiPluginWcoAndroid")
+
+    // ( V2 camera )
+    implementation project(":HualaiPluginCampluginsAndroid")
+
+    // ( V3 camera )
+    implementation project(":HualaiPluginCam3Android")
+
+    // doorbell
+    implementation project(":HualaiPluginDoorbelloneAndroid")
+
+    // (Socket)
+    implementation project(":HualaiPluginSocketAndroid")
+
+    // (Outdoor socket)
+    implementation project(":HualaiPluginSocketoutdoorAndroid")
+
+    // gwell
+    implementation project(":GwellPluginDoorbellAndroid")
+
+    implementation libs.androidx.startup
+
+    // bugsee - debug only
+    debugImplementation(libs.bugsee)
+
+    implementation project(':HualaiPluginGatewayAndroid')
+    implementation project(':HualaiPluginEntryAndroid')
+    implementation project(':HualaiPluginKeypadAndroid')
+    implementation project(':HualaiPluginMotionAndroid')
+
+    implementation project(":modules:common:analytics-app")
+    implementation project(":modules:common:attestation")
+    implementation project(":modules:common:core")
+    implementation project(":modules:common:device")
+    implementation project(":modules:common:device-events")
+    implementation project(":modules:common:featureflag")
+    implementation project(":modules:common:push-notification")
+    implementation project(":modules:common:user")
+    implementation project(":modules:common:ui")
+    implementation project(":modules:common:ui-core")
+    implementation project(":modules:feature:appupdate")
+    implementation project(":modules:feature:device-groups")
+    implementation project(":modules:feature:devicesetup")
+    implementation project(':modules:feature:dynamic-ui')
+    implementation project(':modules:feature:event-history')
+    implementation project(":modules:feature:inappreview")
+    implementation project(":modules:feature:indoor-plug")
+    implementation project(":modules:feature:login")
+    implementation project(":modules:feature:rules-engine")
+
+    // support
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+
+    // 加载控件 (Pull-to-refresh)
+    implementation 'in.srain.cube:ultra-ptr:1.0.11'
+
+    // ApiLevel: 17
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'joda-time:joda-time:2.9.4'
+    implementation libs.androidx.appcompat
+
+    // seekbar plugin camera
+    implementation 'com.github.warkiz.widget:indicatorseekbar:1.2.9'
+
+    // BrainTree
+    implementation 'com.google.android.instantapps:instantapps:1.1.0'
+
+    // Youtube lib
+    implementation 'com.github.PierfrancescoSoffritti:AndroidYouTubePlayer:7.0.1'
+    implementation 'com.wyze:youtubeplayer:1.0.1'
+    implementation 'com.wyze:wheelview:1.0.1'
+
+    // Add the Firebase Crashlytics SDK.
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.12'
+    implementation 'org.conscrypt:conscrypt-android:2.2.1'
+    implementation 'com.google.firebase:firebase-perf:20.2.0'
+
+    // for gif
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.19'
+
+    //doorbell extra
+    implementation 'com.github.Jay-Goo:RangeSeekBar:v2.0.6'
+    implementation 'com.lxj:xpopup:2.2.23'
+
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
+    implementation libs.hilt.work
+    kapt libs.hilt.compilerX
+
+    implementation libs.moshi
+
+    implementation "com.mikepenz:aboutlibraries:10.4.0"
+
+    // extra
+    implementation "com.daimajia.swipelayout:library:1.2.0@aar"
+    implementation 'com.github.PierfrancescoSoffritti:AndroidYouTubePlayer:7.0.1'
+
+    // wpk extra
+    kapt libs.arouter.compiler
+
+    // Media folder migration.
+    implementation 'com.google.guava:guava:30.1.1-android'
+
+    // MP4 parser. Required by HLSDK. Produces crash if removed
+    implementation libs.mp4parser.isoparser
+    implementation libs.mp4parser.muxer
+    // Required by HLSDK. Produces crash if removed
+    implementation 'org.jsoup:jsoup:1.14.2'
+
+    implementation 'com.github.getActivity:XXPermissions:16.6'
+
+    implementation libs.bundles.androidx.core
+    implementation libs.bundles.androidx.fragment
+
+    // Image to text
+    implementation 'com.google.mlkit:text-recognition:16.0.0'
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:19.0.0'
+
+    // chucker
+    def chuckerVersion = '3.5.2'
+    debugImplementation "com.github.chuckerteam.chucker:library:$chuckerVersion"
+    chuckerImplementation "com.github.chuckerteam.chucker:library:$chuckerVersion"
+    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+    alphaReleaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+    betaReleaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+    officialReleaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0'
+
+    implementation libs.bundles.androidx.core
+    implementation libs.androidx.appcompat
+    implementation 'androidx.activity:activity-ktx:1.5.1'
+
+    implementation 'androidx.work:work-runtime:2.7.1'
+
+    // For Kotlin
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
+
+    testImplementation libs.junit
+
+    androidTestImplementation platform(libs.androidx.compose.bom)
+    androidTestImplementation libs.bundles.roku.instrumentedTest.implementation
+    androidTestImplementation(libs.androidx.test.espresso.espressoContrib) {
+        exclude module: "protobuf-lite"
+        exclude group: "org.hamcrest"
+    }
+    androidTestImplementation(libs.assertj) {
+        exclude module: "aspectjrt"
+        exclude module: "aspectjweaver"
+    }
+    androidTestImplementation(libs.reportportal.agent) {
+        exclude group: "org.aspectj", module: "aspectjrt"
+    }
+    androidTestImplementation(libs.reportportal.logback) {
+        exclude module: "aspectjrt"
+        exclude module: "xpp3"
+    }
+    androidTestUtil libs.androidx.test.orchestrator
+    debugImplementation libs.androidx.compose.ui.uiTestManifest
+    testImplementation libs.mockito.core
+}
+
+
+tasks.configureEach { task ->
+    if (task.name.toLowerCase().contains("uploadcrashlytics")) {
+        task.enabled = true
+    }
+    if (task.name ==~ /.*Test.*/) {
+        task.enabled = true
+    }
+}
+
+aboutLibraries {
+    configPath = "HualaiPluginHlsdkAndroid"
+}
+
+def run_on_device_farm() {
+    project.getProperties().get("runOnDeviceFarm") ?: 'false'
+}plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.alibaba.arouter")
+    id("com.google.dagger.hilt.android")
+    id("com.google.firebase.crashlytics")
+    id("com.google.firebase.firebase-perf")
+    id("com.google.gms.google-services")
+    id("com.mikepenz.aboutlibraries.plugin")
+    id("jacoco")
+    id("kotlin-parcelize")
+    id("org.jetbrains.kotlin.kapt")
+}
+
+configurations {
+    chuckerImplementation {}
+    alphaReleaseImplementation {}
+    betaReleaseImplementation {}
+    officialReleaseImplementation {}
+}
+
+Properties getBuildProperties(String propertyName) {
+    Properties properties = new Properties()
+    def file = project.rootProject.file(propertyName)
+    InputStream inputStream = file.newDataInputStream()
+    properties.load(inputStream)
+    inputStream.close()
+    return properties
+}
+
+private static Properties getPropertiesByPath(String dir, String configFileName) {
+
+    try {
+        Properties properties = new Properties()
+        def file = new File("${dir}/${configFileName}")
+        InputStream inputStream = file.newDataInputStream()
+        properties.load(inputStream)
+        inputStream.close()
+        return properties
+    } catch (Exception ignored) {
+        println("No such a file: ${dir}.${configFileName}, please set it up")
+    }
+}
+
+Set<String> pluginSet = new HashSet()
+project.getRootProject().getAllprojects().forEach(x -> {
+    pluginSet.add(x.getName())
+})
+
+/*
+* wyze_debug_build.properties is in version control system.
+* roku_smart_home_production_build.properties is not in version control system.
+* Properties for production release. If no roku_smart_home_production_build.properties set up, it will have an error "Password verification failed" for production release.
+*/
+
+Properties getWyzeProductionBuildProperties() {
+    Properties properties = new Properties()
+    def file = project.rootProject.file('roku_smart_home_production_build.properties')
+    if (!file.exists()) {
+        // Production keystore properties expected to be missing on dev machines, devs use the debug keystore properties
+        return getBuildProperties("wyze_release_build.properties")
+    }
+    InputStream inputStream = file.newDataInputStream()
+    properties.load(inputStream)
+    inputStream.close()
+    println("   production keystore has been set up...")
+    return properties
+}
+
+String getProductionKeystorePath() {
+    Properties properties = new Properties()
+    def fileKeyStore = project.rootProject.file('roku_smart_home_production_build.properties')
+    if (!fileKeyStore.exists()) {
+        // Production keystore path expected to be missing on dev machines, devs use the debug keystore path
+        return file(".").getAbsolutePath() + getBuildProperties("wyze_release_build.properties")['keystorePath']
+    }
+    InputStream inputStream = fileKeyStore.newDataInputStream()
+    properties.load(inputStream)
+    inputStream.close()
+    String keyStorePath = properties['keystorePath']
+    if (keyStorePath.charAt(0).toString() == ".") {
+        def keyStorePathRealPath = projectDir.getParent() + keyStorePath.substring(1)
+        return keyStorePathRealPath
+    } else {
+        return keyStorePath
+    }
+}
+
+def productionBuildProperties = getWyzeProductionBuildProperties()
+def productionKeystorePath = getProductionKeystorePath()
+def debugBuildProperties = getBuildProperties("wyze_debug_build.properties")
+def releaseBuildProperties = getBuildProperties("wyze_release_build.properties")
+def STRING_TEST_CODE_NAME_ALPHA = "\"Alpha Version\""
+def STRING_TEST_CODE_NAME_BETA = "\"Beta Version\""
+def STRING_TEST_CODE_NAME_OFFICIAL = "\"Official Version\""
+
+def STRING_SERVER_OFFICIAL = "\"Official\""
+
+def INT_VERSIONCODE = getVersionCode()
+def STRING_VERSION_NAME = getVersionName()
+def BUILD_ENV_VERSION_CODE = getVersionCode()
+
+def BRAZE_API_KEY_DEV = '"' + (System.getenv("BRAZE_KEY_OWL_ANDROID_DEV") ?: "") + '"'
+def BRAZE_API_KEY_PROD = '"' + (System.getenv("BRAZE_KEY_OWL_ANDROID_PROD") ?: "") + '"'
+
+String getVersionName() {
+    StringBuilder versionName = new StringBuilder()
+    versionName.append("\"")
+    versionName.append(project.ext["versionName"])
+    versionName.append("\"")
+    println("VersionName " + versionName)
+    println("project:" + project.getName())
+    return versionName.toString()
+}
+
+String getVersionCode() {
+    println("VersionCode " + project.ext["versionCode"])
+    return project.ext["versionCode"]
+}
+
+def appInfoProperties = getPropertiesByPath(project.projectDir.getAbsolutePath(), "build_app_info.properties")
+
+
+/*
+ * OwlAppSmarthomeAndroid --> owl-app-smarthome-android -> [owl, app, smarthome, android]
+ * Write a function to map camel string to a low case array
+ * */
+
+private static String[] getNameList(String currentProjectName) {
+    StringBuilder stringBuilder = new StringBuilder()
+    for (char c : currentProjectName.toCharArray()) {
+        char nc = Character.toLowerCase(c)
+        if (Character.isUpperCase(c)) {
+            if (stringBuilder.length() == 0) {
+                stringBuilder.append(nc)
+            } else {
+                stringBuilder.append('-').append(nc)
+            }
+        } else {
+            stringBuilder.append(nc)
+        }
+    }
+    return stringBuilder.toString().split("-")
+}
+
+private static String mapToApplicationId(String[] repoBreakDownArray) {
+    return "com." + repoBreakDownArray[0] + "." + repoBreakDownArray[1] + "." + repoBreakDownArray[2]
+}
+
+def APP_NAME = "Smart Home"
+
+private static String getApplicationId(Properties appInfoProperties, String repoName) {
+    def appId = mapToApplicationId(getNameList(repoName))
+    def applicationIdInProperty = appInfoProperties.getProperty("applicationId")
+    if (applicationIdInProperty == null || applicationIdInProperty.isEmpty()) {
+        println "getApplicationId-----> ${appId}"
+        return appId
+    } else {
+        println "getApplicationId-----> ${applicationIdInProperty}"
+        return applicationIdInProperty
+    }
+
+}
+
+def APP_ID = getApplicationId(appInfoProperties, project.getRootProject().getName())
+
+android {
+    namespace = "com.hualai"
+    compileSdk libs.versions.compileSdk.get().toInteger()
+
+    defaultConfig {
+        resValue "string", "app_name", "${APP_NAME}Beta"
+        buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+        buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_BETA)
+        buildConfigField "boolean", "isChangeServer", "true"
+        buildConfigField "boolean", "isChangeTestCode", "true"
+        buildConfigField "boolean", "isChangeChannel", "true"
+        buildConfigField("int", "VERSION_CODE", INT_VERSIONCODE)
+        buildConfigField("String", "VERSION_NAME", STRING_VERSION_NAME)
+        buildConfigField("String", "APPLICATION_ID", "\"" + "${APP_ID}" + "\"")
+        buildConfigField("String", "DEVELOP_INFO", '""')
+        buildConfigField("String", "VERSION_NAME_SUFFIX", '""')
+        buildConfigField("String", "OWL_BUILD_TPYE", '\"BUILD_TYPE_DEBUG\"')
+        applicationId APP_ID
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.targetSdk.get().toInteger()
+        versionCode project.ext["versionCode"]
+        versionName project.ext["versionName"]
+        signingConfig signingConfigs.debug
+        multiDexEnabled true
+        testInstrumentationRunner "com.roku.rokuhome.test.runner.CucumberTestRunner"
+        testBuildType System.getProperty("testBuildType", "debug")
+//        Enable the below line when using AndroidTestOrchestrator
+//        testInstrumentationRunnerArguments clearPackageData: 'true'
+//        adbOptions {
+//            installOptions '-g', '-r'
+//        }
+//        testOptions {
+//            execution 'ANDROIDX_TEST_ORCHESTRATOR'
+//        }
+        buildConfigField('boolean', 'ENABLE_REPORT_PORTAL', project.getProperties().get("reportPortal") ?: 'false')
+        buildConfigField('boolean', 'RUN_ON_DEVICE_FARM', run_on_device_farm())
+
+        /*
+        * specify output file name, fox example: Wyze-61560-2_24_1-release.aab or Wyze-61560-2_24_1-debug.apk
+        * '-release' is the build type.
+        * .apk is the file format, if we use bundle build, it will be .aab
+        * */
+        setProperty("archivesBaseName", "Roku-Smart-Home-" + versionCode + "-" + versionName.toString().replaceAll('\\.', '_'))
+
+        ndk {
+            abiFilters "arm64-v8a", "armeabi-v7a"
+        }
+        resConfigs 'en'
+
+        kapt {
+            arguments {
+                arg("AROUTER_MODULE_NAME", project.getName())
+            }
+        }
+    }
+
+    signingConfigs {
+
+        debug {
+            storeFile new File(file(".").getAbsolutePath() + debugBuildProperties['keystorePath']).getAbsoluteFile()
+            storePassword debugBuildProperties['storePassword']
+            keyAlias debugBuildProperties['keyAlias']
+            keyPassword debugBuildProperties['keyPassword']
+            v2SigningEnabled true
+        }
+
+        release {
+            storeFile new File(file(".").getAbsolutePath() + releaseBuildProperties['keystorePath']).getAbsoluteFile()
+            storePassword releaseBuildProperties['storePassword']
+            keyAlias releaseBuildProperties['keyAlias']
+            keyPassword releaseBuildProperties['keyPassword']
+            v2SigningEnabled true
+        }
+
+        productionRelease {
+            storeFile new File(productionKeystorePath).getAbsoluteFile()
+            storePassword productionBuildProperties['storePassword']
+            keyAlias productionBuildProperties['keyAlias']
+            keyPassword productionBuildProperties['keyPassword']
+            v2SigningEnabled true
+        }
+    }
+
+    buildTypes {
+        // Use these to selectively enable and disable startup actions with a manifestPlaceholders element
+        def startupItemEnabled = "androidx.startup"
+        def startupItemNotEnabled = ""
+
+        /*
+        * debug build: the only build that allows Charles to intercept app traffic.
+        * */
+        debug {
+            debuggable true
+            signingConfig signingConfigs.debug
+            versionNameSuffix ""
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\"\"")
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_DEV)
+
+            manifestPlaceholders.bugseeEnabled = startupItemEnabled
+            testCoverageEnabled = true
+        }
+
+        chucker {
+            initWith debug
+            signingConfig signingConfigs.debug
+            matchingFallbacks = ['debug']
+
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+        /*
+        * The following three build types are production release.
+        * production build: it's used by Google Play Store.
+        * signingConfig should be set up in 'roku_smart_home_production_build.properties' of the project root dir.
+        * */
+        alphaRelease {
+            debuggable false
+            initWith release
+            buildConfigField "boolean", "isChangeServer", "false"
+            buildConfigField "boolean", "isChangeTestCode", "false"
+            buildConfigField "boolean", "isChangeChannel", "false"
+            signingConfig signingConfigs.productionRelease
+            resValue "string", "app_name", "${APP_NAME}Alpha"
+            buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+            buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_ALPHA)
+            versionNameSuffix ".a${BUILD_ENV_VERSION_CODE}"
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\".a${BUILD_ENV_VERSION_CODE}\"")
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_PROD)
+            matchingFallbacks = ['release']
+
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+        betaRelease {
+            debuggable false
+            initWith release
+            buildConfigField "boolean", "isChangeServer", "false"
+            buildConfigField "boolean", "isChangeTestCode", "false"
+            buildConfigField "boolean", "isChangeChannel", "false"
+            signingConfig signingConfigs.productionRelease
+            resValue "string", "app_name", "${APP_NAME}Beta"
+            buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+
+            //Note: For beta release, the testCodeName is STRING_TEST_CODE_NAME_OFFICIAL！
+            buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_BETA)
+            versionNameSuffix ".b${BUILD_ENV_VERSION_CODE}"
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\".b${BUILD_ENV_VERSION_CODE}\"")
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_PROD)
+            matchingFallbacks = ['release']
+
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+        release {
+            debuggable true
+            initWith release
+            buildConfigField "boolean", "isChangeServer", "false"
+            buildConfigField "boolean", "isChangeTestCode", "false"
+            buildConfigField "boolean", "isChangeChannel", "false"
+            signingConfig signingConfigs.productionRelease
+            resValue "string", "app_name", "${APP_NAME}"
+            buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+            buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_OFFICIAL)
+            versionNameSuffix ".${BUILD_ENV_VERSION_CODE}"
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\".${BUILD_ENV_VERSION_CODE}\"")
+            matchingFallbacks = ['release']
+            buildConfigField("String", "OWL_BUILD_TPYE", '\"BUILD_TYPE_OFFICIAL_RELEASE\"')
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_PROD)
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+    }
+    packagingOptions {
+        jniLibs {
+            excludes += ['junit/runner/*', 'lib/armeabi-v7a/libaac_codec.so', 'lib/arm64-v8a/libpl_droidsonroids_gif.so', 'lib/armeabi-v7a/libpl_droidsonroids_gif.so', 'kotlin/**']
+            pickFirsts += ['lib/armeabi-v7a/libc++_shared.so', 'lib/arm64-v8a/libc++_shared.so', 'lib/armeabi-v7a/libmarsxlog.so', 'lib/arm64-v8a/libmarsxlog.so']
+        }
+        resources {
+            excludes += ['META-INF/CHANGES', 'META-INF/README.md', 'Grizzly_THIRDPARTYLICENSEREADME.txt', 'billing.properties', 'build-data.properties', 'LICENSE-junit.txt', 'junit/runner/*', 'META-INF/INDEX.LIST', 'builddef.lst', 'isoparser2-default.properties', 'version2.txt', 'places.properties', 'transport-*.properties', 'play-services-*.properties', 'META-INF/*.version', 'androidsupportmultidexversion.txt', 'firebase-*.properties', 'META-INF/*.kotlin_module', 'kotlin/**', 'META-INF/aop-ajc.xml']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    buildFeatures {
+        buildConfig = true
+        compose = true
+        dataBinding true
+        viewBinding true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.compose.kotlinCompilerVersion.get()
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+        disable 'InvalidPackage', 'Instantiatable'
+    }
+
+    preBuild.configure {
+        dependsOn installGitHook
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+configurations.configureEach {
+    resolutionStrategy {
+        force libs.junit
+    }
+}
+
+dependencies {
+    implementation(libs.bundles.androidx.compose)
+    implementation(libs.androidx.compose.activity)
+
+    // WPK
+    implementation project(":WyzeAndroidWpkAndroid")
+    implementation project(":WyzePluginEventAndroid")
+    implementation project(":WyzePluginRuleAndroid")
+
+    // hms
+    implementation project(":WyzePluginHmsAndroid")
+
+    // (Color bulb)
+    implementation project(":WyzePluginCommonlightAndroid")
+    implementation project(":HualaiPluginHlsdkAndroid")
+
+    // (Hualai setup plugin)
+    implementation project(":HualaiPluginSetupAndroid")
+
+    // (Hualai wifi plugin)
+    implementation project(":HualaiPluginWifiAndroid")
+
+    /*----------Hualai camera plugin bundle start----------*/
+
+    // (Hualai cam sdk)
+    implementation project(':TutkPluginSdkAndroid')
+
+    // camera group
+    implementation project(":HualaiPluginCamgroupAndroid")
+
+    // ( Wyze Outdoor Camera )
+    implementation project(":HualaiPluginWcoAndroid")
+
+    // ( V2 camera )
+    implementation project(":HualaiPluginCampluginsAndroid")
+
+    // ( V3 camera )
+    implementation project(":HualaiPluginCam3Android")
+
+    // doorbell
+    implementation project(":HualaiPluginDoorbelloneAndroid")
+
+    // (Socket)
+    implementation project(":HualaiPluginSocketAndroid")
+
+    // (Outdoor socket)
+    implementation project(":HualaiPluginSocketoutdoorAndroid")
+
+    // gwell
+    implementation project(":GwellPluginDoorbellAndroid")
+
+    implementation libs.androidx.startup
+
+    // bugsee - debug only
+    debugImplementation(libs.bugsee)
+
+    implementation project(':HualaiPluginGatewayAndroid')
+    implementation project(':HualaiPluginEntryAndroid')
+    implementation project(':HualaiPluginKeypadAndroid')
+    implementation project(':HualaiPluginMotionAndroid')
+
+    implementation project(":modules:common:analytics-app")
+    implementation project(":modules:common:attestation")
+    implementation project(":modules:common:core")
+    implementation project(":modules:common:device")
+    implementation project(":modules:common:device-events")
+    implementation project(":modules:common:featureflag")
+    implementation project(":modules:common:push-notification")
+    implementation project(":modules:common:user")
+    implementation project(":modules:common:ui")
+    implementation project(":modules:common:ui-core")
+    implementation project(":modules:feature:appupdate")
+    implementation project(":modules:feature:device-groups")
+    implementation project(":modules:feature:devicesetup")
+    implementation project(':modules:feature:dynamic-ui')
+    implementation project(':modules:feature:event-history')
+    implementation project(":modules:feature:inappreview")
+    implementation project(":modules:feature:indoor-plug")
+    implementation project(":modules:feature:login")
+    implementation project(":modules:feature:rules-engine")
+
+    // support
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+
+    // 加载控件 (Pull-to-refresh)
+    implementation 'in.srain.cube:ultra-ptr:1.0.11'
+
+    // ApiLevel: 17
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'joda-time:joda-time:2.9.4'
+    implementation libs.androidx.appcompat
+
+    // seekbar plugin camera
+    implementation 'com.github.warkiz.widget:indicatorseekbar:1.2.9'
+
+    // BrainTree
+    implementation 'com.google.android.instantapps:instantapps:1.1.0'
+
+    // Youtube lib
+    implementation 'com.github.PierfrancescoSoffritti:AndroidYouTubePlayer:7.0.1'
+    implementation 'com.wyze:youtubeplayer:1.0.1'
+    implementation 'com.wyze:wheelview:1.0.1'
+
+    // Add the Firebase Crashlytics SDK.
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.12'
+    implementation 'org.conscrypt:conscrypt-android:2.2.1'
+    implementation 'com.google.firebase:firebase-perf:20.2.0'
+
+    // for gif
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.19'
+
+    //doorbell extra
+    implementation 'com.github.Jay-Goo:RangeSeekBar:v2.0.6'
+    implementation 'com.lxj:xpopup:2.2.23'
+
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
+    implementation libs.hilt.work
+    kapt libs.hilt.compilerX
+
+    implementation libs.moshi
+
+    implementation "com.mikepenz:aboutlibraries:10.4.0"
+
+    // extra
+    implementation "com.daimajia.swipelayout:library:1.2.0@aar"
+    implementation 'com.github.PierfrancescoSoffritti:AndroidYouTubePlayer:7.0.1'
+
+    // wpk extra
+    kapt libs.arouter.compiler
+
+    // Media folder migration.
+    implementation 'com.google.guava:guava:30.1.1-android'
+
+    // MP4 parser. Required by HLSDK. Produces crash if removed
+    implementation libs.mp4parser.isoparser
+    implementation libs.mp4parser.muxer
+    // Required by HLSDK. Produces crash if removed
+    implementation 'org.jsoup:jsoup:1.14.2'
+
+    implementation 'com.github.getActivity:XXPermissions:16.6'
+
+    implementation libs.bundles.androidx.core
+    implementation libs.bundles.androidx.fragment
+
+    // Image to text
+    implementation 'com.google.mlkit:text-recognition:16.0.0'
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:19.0.0'
+
+    // chucker
+    def chuckerVersion = '3.5.2'
+    debugImplementation "com.github.chuckerteam.chucker:library:$chuckerVersion"
+    chuckerImplementation "com.github.chuckerteam.chucker:library:$chuckerVersion"
+    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+    alphaReleaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+    betaReleaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+    officialReleaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0'
+
+    implementation libs.bundles.androidx.core
+    implementation libs.androidx.appcompat
+    implementation 'androidx.activity:activity-ktx:1.5.1'
+
+    implementation 'androidx.work:work-runtime:2.7.1'
+
+    // For Kotlin
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
+
+    testImplementation libs.junit
+
+    androidTestImplementation platform(libs.androidx.compose.bom)
+    androidTestImplementation libs.bundles.roku.instrumentedTest.implementation
+    androidTestImplementation(libs.androidx.test.espresso.espressoContrib) {
+        exclude module: "protobuf-lite"
+        exclude group: "org.hamcrest"
+    }
+    androidTestImplementation(libs.assertj) {
+        exclude module: "aspectjrt"
+        exclude module: "aspectjweaver"
+    }
+    androidTestImplementation(libs.reportportal.agent) {
+        exclude group: "org.aspectj", module: "aspectjrt"
+    }
+    androidTestImplementation(libs.reportportal.logback) {
+        exclude module: "aspectjrt"
+        exclude module: "xpp3"
+    }
+    androidTestUtil libs.androidx.test.orchestrator
+    debugImplementation libs.androidx.compose.ui.uiTestManifest
+    testImplementation libs.mockito.core
+}
+
+
+tasks.configureEach { task ->
+    if (task.name.toLowerCase().contains("uploadcrashlytics")) {
+        task.enabled = true
+    }
+    if (task.name ==~ /.*Test.*/) {
+        task.enabled = true
+    }
+}
+
+aboutLibraries {
+    configPath = "HualaiPluginHlsdkAndroid"
+}
+
+def run_on_device_farm() {
+    project.getProperties().get("runOnDeviceFarm") ?: 'false'
+}plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.alibaba.arouter")
+    id("com.google.dagger.hilt.android")
+    id("com.google.firebase.crashlytics")
+    id("com.google.firebase.firebase-perf")
+    id("com.google.gms.google-services")
+    id("com.mikepenz.aboutlibraries.plugin")
+    id("jacoco")
+    id("kotlin-parcelize")
+    id("org.jetbrains.kotlin.kapt")
+}
+
+configurations {
+    chuckerImplementation {}
+    alphaReleaseImplementation {}
+    betaReleaseImplementation {}
+    officialReleaseImplementation {}
+}
+
+Properties getBuildProperties(String propertyName) {
+    Properties properties = new Properties()
+    def file = project.rootProject.file(propertyName)
+    InputStream inputStream = file.newDataInputStream()
+    properties.load(inputStream)
+    inputStream.close()
+    return properties
+}
+
+private static Properties getPropertiesByPath(String dir, String configFileName) {
+
+    try {
+        Properties properties = new Properties()
+        def file = new File("${dir}/${configFileName}")
+        InputStream inputStream = file.newDataInputStream()
+        properties.load(inputStream)
+        inputStream.close()
+        return properties
+    } catch (Exception ignored) {
+        println("No such a file: ${dir}.${configFileName}, please set it up")
+    }
+}
+
+Set<String> pluginSet = new HashSet()
+project.getRootProject().getAllprojects().forEach(x -> {
+    pluginSet.add(x.getName())
+})
+
+/*
+* wyze_debug_build.properties is in version control system.
+* roku_smart_home_production_build.properties is not in version control system.
+* Properties for production release. If no roku_smart_home_production_build.properties set up, it will have an error "Password verification failed" for production release.
+*/
+
+Properties getWyzeProductionBuildProperties() {
+    Properties properties = new Properties()
+    def file = project.rootProject.file('roku_smart_home_production_build.properties')
+    if (!file.exists()) {
+        // Production keystore properties expected to be missing on dev machines, devs use the debug keystore properties
+        return getBuildProperties("wyze_release_build.properties")
+    }
+    InputStream inputStream = file.newDataInputStream()
+    properties.load(inputStream)
+    inputStream.close()
+    println("   production keystore has been set up...")
+    return properties
+}
+
+String getProductionKeystorePath() {
+    Properties properties = new Properties()
+    def fileKeyStore = project.rootProject.file('roku_smart_home_production_build.properties')
+    if (!fileKeyStore.exists()) {
+        // Production keystore path expected to be missing on dev machines, devs use the debug keystore path
+        return file(".").getAbsolutePath() + getBuildProperties("wyze_release_build.properties")['keystorePath']
+    }
+    InputStream inputStream = fileKeyStore.newDataInputStream()
+    properties.load(inputStream)
+    inputStream.close()
+    String keyStorePath = properties['keystorePath']
+    if (keyStorePath.charAt(0).toString() == ".") {
+        def keyStorePathRealPath = projectDir.getParent() + keyStorePath.substring(1)
+        return keyStorePathRealPath
+    } else {
+        return keyStorePath
+    }
+}
+
+def productionBuildProperties = getWyzeProductionBuildProperties()
+def productionKeystorePath = getProductionKeystorePath()
+def debugBuildProperties = getBuildProperties("wyze_debug_build.properties")
+def releaseBuildProperties = getBuildProperties("wyze_release_build.properties")
+def STRING_TEST_CODE_NAME_ALPHA = "\"Alpha Version\""
+def STRING_TEST_CODE_NAME_BETA = "\"Beta Version\""
+def STRING_TEST_CODE_NAME_OFFICIAL = "\"Official Version\""
+
+def STRING_SERVER_OFFICIAL = "\"Official\""
+
+def INT_VERSIONCODE = getVersionCode()
+def STRING_VERSION_NAME = getVersionName()
+def BUILD_ENV_VERSION_CODE = getVersionCode()
+
+def BRAZE_API_KEY_DEV = '"' + (System.getenv("BRAZE_KEY_OWL_ANDROID_DEV") ?: "") + '"'
+def BRAZE_API_KEY_PROD = '"' + (System.getenv("BRAZE_KEY_OWL_ANDROID_PROD") ?: "") + '"'
+
+String getVersionName() {
+    StringBuilder versionName = new StringBuilder()
+    versionName.append("\"")
+    versionName.append(project.ext["versionName"])
+    versionName.append("\"")
+    println("VersionName " + versionName)
+    println("project:" + project.getName())
+    return versionName.toString()
+}
+
+String getVersionCode() {
+    println("VersionCode " + project.ext["versionCode"])
+    return project.ext["versionCode"]
+}
+
+def appInfoProperties = getPropertiesByPath(project.projectDir.getAbsolutePath(), "build_app_info.properties")
+
+
+/*
+ * OwlAppSmarthomeAndroid --> owl-app-smarthome-android -> [owl, app, smarthome, android]
+ * Write a function to map camel string to a low case array
+ * */
+
+private static String[] getNameList(String currentProjectName) {
+    StringBuilder stringBuilder = new StringBuilder()
+    for (char c : currentProjectName.toCharArray()) {
+        char nc = Character.toLowerCase(c)
+        if (Character.isUpperCase(c)) {
+            if (stringBuilder.length() == 0) {
+                stringBuilder.append(nc)
+            } else {
+                stringBuilder.append('-').append(nc)
+            }
+        } else {
+            stringBuilder.append(nc)
+        }
+    }
+    return stringBuilder.toString().split("-")
+}
+
+private static String mapToApplicationId(String[] repoBreakDownArray) {
+    return "com." + repoBreakDownArray[0] + "." + repoBreakDownArray[1] + "." + repoBreakDownArray[2]
+}
+
+def APP_NAME = "Smart Home"
+
+private static String getApplicationId(Properties appInfoProperties, String repoName) {
+    def appId = mapToApplicationId(getNameList(repoName))
+    def applicationIdInProperty = appInfoProperties.getProperty("applicationId")
+    if (applicationIdInProperty == null || applicationIdInProperty.isEmpty()) {
+        println "getApplicationId-----> ${appId}"
+        return appId
+    } else {
+        println "getApplicationId-----> ${applicationIdInProperty}"
+        return applicationIdInProperty
+    }
+
+}
+
+def APP_ID = getApplicationId(appInfoProperties, project.getRootProject().getName())
+
+android {
+    namespace = "com.hualai"
+    compileSdk libs.versions.compileSdk.get().toInteger()
+
+    defaultConfig {
+        resValue "string", "app_name", "${APP_NAME}Beta"
+        buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+        buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_BETA)
+        buildConfigField "boolean", "isChangeServer", "true"
+        buildConfigField "boolean", "isChangeTestCode", "true"
+        buildConfigField "boolean", "isChangeChannel", "true"
+        buildConfigField("int", "VERSION_CODE", INT_VERSIONCODE)
+        buildConfigField("String", "VERSION_NAME", STRING_VERSION_NAME)
+        buildConfigField("String", "APPLICATION_ID", "\"" + "${APP_ID}" + "\"")
+        buildConfigField("String", "DEVELOP_INFO", '""')
+        buildConfigField("String", "VERSION_NAME_SUFFIX", '""')
+        buildConfigField("String", "OWL_BUILD_TPYE", '\"BUILD_TYPE_DEBUG\"')
+        applicationId APP_ID
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.targetSdk.get().toInteger()
+        versionCode project.ext["versionCode"]
+        versionName project.ext["versionName"]
+        signingConfig signingConfigs.debug
+        multiDexEnabled true
+        testInstrumentationRunner "com.roku.rokuhome.test.runner.CucumberTestRunner"
+        testBuildType System.getProperty("testBuildType", "debug")
+//        Enable the below line when using AndroidTestOrchestrator
+//        testInstrumentationRunnerArguments clearPackageData: 'true'
+//        adbOptions {
+//            installOptions '-g', '-r'
+//        }
+//        testOptions {
+//            execution 'ANDROIDX_TEST_ORCHESTRATOR'
+//        }
+        buildConfigField('boolean', 'ENABLE_REPORT_PORTAL', project.getProperties().get("reportPortal") ?: 'false')
+        buildConfigField('boolean', 'RUN_ON_DEVICE_FARM', run_on_device_farm())
+
+        /*
+        * specify output file name, fox example: Wyze-61560-2_24_1-release.aab or Wyze-61560-2_24_1-debug.apk
+        * '-release' is the build type.
+        * .apk is the file format, if we use bundle build, it will be .aab
+        * */
+        setProperty("archivesBaseName", "Roku-Smart-Home-" + versionCode + "-" + versionName.toString().replaceAll('\\.', '_'))
+
+        ndk {
+            abiFilters "arm64-v8a", "armeabi-v7a"
+        }
+        resConfigs 'en'
+
+        kapt {
+            arguments {
+                arg("AROUTER_MODULE_NAME", project.getName())
+            }
+        }
+    }
+
+    signingConfigs {
+
+        debug {
+            storeFile new File(file(".").getAbsolutePath() + debugBuildProperties['keystorePath']).getAbsoluteFile()
+            storePassword debugBuildProperties['storePassword']
+            keyAlias debugBuildProperties['keyAlias']
+            keyPassword debugBuildProperties['keyPassword']
+            v2SigningEnabled true
+        }
+
+        release {
+            storeFile new File(file(".").getAbsolutePath() + releaseBuildProperties['keystorePath']).getAbsoluteFile()
+            storePassword releaseBuildProperties['storePassword']
+            keyAlias releaseBuildProperties['keyAlias']
+            keyPassword releaseBuildProperties['keyPassword']
+            v2SigningEnabled true
+        }
+
+        productionRelease {
+            storeFile new File(productionKeystorePath).getAbsoluteFile()
+            storePassword productionBuildProperties['storePassword']
+            keyAlias productionBuildProperties['keyAlias']
+            keyPassword productionBuildProperties['keyPassword']
+            v2SigningEnabled true
+        }
+    }
+
+    buildTypes {
+        // Use these to selectively enable and disable startup actions with a manifestPlaceholders element
+        def startupItemEnabled = "androidx.startup"
+        def startupItemNotEnabled = ""
+
+        /*
+        * debug build: the only build that allows Charles to intercept app traffic.
+        * */
+        debug {
+            debuggable true
+            signingConfig signingConfigs.debug
+            versionNameSuffix ""
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\"\"")
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_DEV)
+
+            manifestPlaceholders.bugseeEnabled = startupItemEnabled
+            testCoverageEnabled = true
+        }
+
+        chucker {
+            initWith debug
+            signingConfig signingConfigs.debug
+            matchingFallbacks = ['debug']
+
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+        /*
+        * The following three build types are production release.
+        * production build: it's used by Google Play Store.
+        * signingConfig should be set up in 'roku_smart_home_production_build.properties' of the project root dir.
+        * */
+        alphaRelease {
+            debuggable false
+            initWith release
+            buildConfigField "boolean", "isChangeServer", "false"
+            buildConfigField "boolean", "isChangeTestCode", "false"
+            buildConfigField "boolean", "isChangeChannel", "false"
+            signingConfig signingConfigs.productionRelease
+            resValue "string", "app_name", "${APP_NAME}Alpha"
+            buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+            buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_ALPHA)
+            versionNameSuffix ".a${BUILD_ENV_VERSION_CODE}"
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\".a${BUILD_ENV_VERSION_CODE}\"")
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_PROD)
+            matchingFallbacks = ['release']
+
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+        betaRelease {
+            debuggable false
+            initWith release
+            buildConfigField "boolean", "isChangeServer", "false"
+            buildConfigField "boolean", "isChangeTestCode", "false"
+            buildConfigField "boolean", "isChangeChannel", "false"
+            signingConfig signingConfigs.productionRelease
+            resValue "string", "app_name", "${APP_NAME}Beta"
+            buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+
+            //Note: For beta release, the testCodeName is STRING_TEST_CODE_NAME_OFFICIAL！
+            buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_BETA)
+            versionNameSuffix ".b${BUILD_ENV_VERSION_CODE}"
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\".b${BUILD_ENV_VERSION_CODE}\"")
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_PROD)
+            matchingFallbacks = ['release']
+
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+        release {
+    debuggable true
+            initWith release
+            buildConfigField "boolean", "isChangeServer", "false"
+            buildConfigField "boolean", "isChangeTestCode", "false"
+            buildConfigField "boolean", "isChangeChannel", "false"
+            signingConfig signingConfigs.productionRelease
+            resValue "string", "app_name", "${APP_NAME}"
+            buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+            buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_OFFICIAL)
+            versionNameSuffix ".${BUILD_ENV_VERSION_CODE}"
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\".${BUILD_ENV_VERSION_CODE}\"")
+            matchingFallbacks = ['release']
+            buildConfigField("String", "OWL_BUILD_TPYE", '\"BUILD_TYPE_OFFICIAL_RELEASE\"')
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_PROD)
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+    }
+    packagingOptions {
+        jniLibs {
+            excludes += ['junit/runner/*', 'lib/armeabi-v7a/libaac_codec.so', 'lib/arm64-v8a/libpl_droidsonroids_gif.so', 'lib/armeabi-v7a/libpl_droidsonroids_gif.so', 'kotlin/**']
+            pickFirsts += ['lib/armeabi-v7a/libc++_shared.so', 'lib/arm64-v8a/libc++_shared.so', 'lib/armeabi-v7a/libmarsxlog.so', 'lib/arm64-v8a/libmarsxlog.so']
+        }
+        resources {
+            excludes += ['META-INF/CHANGES', 'META-INF/README.md', 'Grizzly_THIRDPARTYLICENSEREADME.txt', 'billing.properties', 'build-data.properties', 'LICENSE-junit.txt', 'junit/runner/*', 'META-INF/INDEX.LIST', 'builddef.lst', 'isoparser2-default.properties', 'version2.txt', 'places.properties', 'transport-*.properties', 'play-services-*.properties', 'META-INF/*.version', 'androidsupportmultidexversion.txt', 'firebase-*.properties', 'META-INF/*.kotlin_module', 'kotlin/**', 'META-INF/aop-ajc.xml']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    buildFeatures {
+        buildConfig = true
+        compose = true
+        dataBinding true
+        viewBinding true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.compose.kotlinCompilerVersion.get()
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+        disable 'InvalidPackage', 'Instantiatable'
+    }
+
+    preBuild.configure {
+        dependsOn installGitHook
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+configurations.configureEach {
+    resolutionStrategy {
+        force libs.junit
+    }
+}
+
+dependencies {
+    implementation(libs.bundles.androidx.compose)
+    implementation(libs.androidx.compose.activity)
+
+    // WPK
+    implementation project(":WyzeAndroidWpkAndroid")
+    implementation project(":WyzePluginEventAndroid")
+    implementation project(":WyzePluginRuleAndroid")
+
+    // hms
+    implementation project(":WyzePluginHmsAndroid")
+
+    // (Color bulb)
+    implementation project(":WyzePluginCommonlightAndroid")
+    implementation project(":HualaiPluginHlsdkAndroid")
+
+    // (Hualai setup plugin)
+    implementation project(":HualaiPluginSetupAndroid")
+
+    // (Hualai wifi plugin)
+    implementation project(":HualaiPluginWifiAndroid")
+
+    /*----------Hualai camera plugin bundle start----------*/
+
+    // (Hualai cam sdk)
+    implementation project(':TutkPluginSdkAndroid')
+
+    // camera group
+    implementation project(":HualaiPluginCamgroupAndroid")
+
+    // ( Wyze Outdoor Camera )
+    implementation project(":HualaiPluginWcoAndroid")
+
+    // ( V2 camera )
+    implementation project(":HualaiPluginCampluginsAndroid")
+
+    // ( V3 camera )
+    implementation project(":HualaiPluginCam3Android")
+
+    // doorbell
+    implementation project(":HualaiPluginDoorbelloneAndroid")
+
+    // (Socket)
+    implementation project(":HualaiPluginSocketAndroid")
+
+    // (Outdoor socket)
+    implementation project(":HualaiPluginSocketoutdoorAndroid")
+
+    // gwell
+    implementation project(":GwellPluginDoorbellAndroid")
+
+    implementation libs.androidx.startup
+
+    // bugsee - debug only
+    debugImplementation(libs.bugsee)
+
+    implementation project(':HualaiPluginGatewayAndroid')
+    implementation project(':HualaiPluginEntryAndroid')
+    implementation project(':HualaiPluginKeypadAndroid')
+    implementation project(':HualaiPluginMotionAndroid')
+
+    implementation project(":modules:common:analytics-app")
+    implementation project(":modules:common:attestation")
+    implementation project(":modules:common:core")
+    implementation project(":modules:common:device")
+    implementation project(":modules:common:device-events")
+    implementation project(":modules:common:featureflag")
+    implementation project(":modules:common:push-notification")
+    implementation project(":modules:common:user")
+    implementation project(":modules:common:ui")
+    implementation project(":modules:common:ui-core")
+    implementation project(":modules:feature:appupdate")
+    implementation project(":modules:feature:device-groups")
+    implementation project(":modules:feature:devicesetup")
+    implementation project(':modules:feature:dynamic-ui')
+    implementation project(':modules:feature:event-history')
+    implementation project(":modules:feature:inappreview")
+    implementation project(":modules:feature:indoor-plug")
+    implementation project(":modules:feature:login")
+    implementation project(":modules:feature:rules-engine")
+
+    // support
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+
+    // 加载控件 (Pull-to-refresh)
+    implementation 'in.srain.cube:ultra-ptr:1.0.11'
+
+    // ApiLevel: 17
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'joda-time:joda-time:2.9.4'
+    implementation libs.androidx.appcompat
+
+    // seekbar plugin camera
+    implementation 'com.github.warkiz.widget:indicatorseekbar:1.2.9'
+
+    // BrainTree
+    implementation 'com.google.android.instantapps:instantapps:1.1.0'
+
+    // Youtube lib
+    implementation 'com.github.PierfrancescoSoffritti:AndroidYouTubePlayer:7.0.1'
+    implementation 'com.wyze:youtubeplayer:1.0.1'
+    implementation 'com.wyze:wheelview:1.0.1'
+
+    // Add the Firebase Crashlytics SDK.
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.12'
+    implementation 'org.conscrypt:conscrypt-android:2.2.1'
+    implementation 'com.google.firebase:firebase-perf:20.2.0'
+
+    // for gif
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.19'
+
+    //doorbell extra
+    implementation 'com.github.Jay-Goo:RangeSeekBar:v2.0.6'
+    implementation 'com.lxj:xpopup:2.2.23'
+
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
+    implementation libs.hilt.work
+    kapt libs.hilt.compilerX
+
+    implementation libs.moshi
+
+    implementation "com.mikepenz:aboutlibraries:10.4.0"
+
+    // extra
+    implementation "com.daimajia.swipelayout:library:1.2.0@aar"
+    implementation 'com.github.PierfrancescoSoffritti:AndroidYouTubePlayer:7.0.1'
+
+    // wpk extra
+    kapt libs.arouter.compiler
+
+    // Media folder migration.
+    implementation 'com.google.guava:guava:30.1.1-android'
+
+    // MP4 parser. Required by HLSDK. Produces crash if removed
+    implementation libs.mp4parser.isoparser
+    implementation libs.mp4parser.muxer
+    // Required by HLSDK. Produces crash if removed
+    implementation 'org.jsoup:jsoup:1.14.2'
+
+    implementation 'com.github.getActivity:XXPermissions:16.6'
+
+    implementation libs.bundles.androidx.core
+    implementation libs.bundles.androidx.fragment
+
+    // Image to text
+    implementation 'com.google.mlkit:text-recognition:16.0.0'
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:19.0.0'
+
+    // chucker
+    def chuckerVersion = '3.5.2'
+    debugImplementation "com.github.chuckerteam.chucker:library:$chuckerVersion"
+    chuckerImplementation "com.github.chuckerteam.chucker:library:$chuckerVersion"
+    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+    alphaReleaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+    betaReleaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+    officialReleaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0'
+
+    implementation libs.bundles.androidx.core
+    implementation libs.androidx.appcompat
+    implementation 'androidx.activity:activity-ktx:1.5.1'
+
+    implementation 'androidx.work:work-runtime:2.7.1'
+
+    // For Kotlin
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
+
+    testImplementation libs.junit
+
+    androidTestImplementation platform(libs.androidx.compose.bom)
+    androidTestImplementation libs.bundles.roku.instrumentedTest.implementation
+    androidTestImplementation(libs.androidx.test.espresso.espressoContrib) {
+        exclude module: "protobuf-lite"
+        exclude group: "org.hamcrest"
+    }
+    androidTestImplementation(libs.assertj) {
+        exclude module: "aspectjrt"
+        exclude module: "aspectjweaver"
+    }
+    androidTestImplementation(libs.reportportal.agent) {
+        exclude group: "org.aspectj", module: "aspectjrt"
+    }
+    androidTestImplementation(libs.reportportal.logback) {
+        exclude module: "aspectjrt"
+        exclude module: "xpp3"
+    }
+    androidTestUtil libs.androidx.test.orchestrator
+    debugImplementation libs.androidx.compose.ui.uiTestManifest
+    testImplementation libs.mockito.core
+}
+
+
+tasks.configureEach { task ->
+    if (task.name.toLowerCase().contains("uploadcrashlytics")) {
+        task.enabled = true
+    }
+    if (task.name ==~ /.*Test.*/) {
+        task.enabled = true
+    }
+}
+
+aboutLibraries {
+    configPath = "HualaiPluginHlsdkAndroid"
+}
+
+def run_on_device_farm() {
+    project.getProperties().get("runOnDeviceFarm") ?: 'false'
+}plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.alibaba.arouter")
+    id("com.google.dagger.hilt.android")
+    id("com.google.firebase.crashlytics")
+    id("com.google.firebase.firebase-perf")
+    id("com.google.gms.google-services")
+    id("com.mikepenz.aboutlibraries.plugin")
+    id("jacoco")
+    id("kotlin-parcelize")
+    id("org.jetbrains.kotlin.kapt")
+}
+
+configurations {
+    chuckerImplementation {}
+    alphaReleaseImplementation {}
+    betaReleaseImplementation {}
+    officialReleaseImplementation {}
+}
+
+Properties getBuildProperties(String propertyName) {
+    Properties properties = new Properties()
+    def file = project.rootProject.file(propertyName)
+    InputStream inputStream = file.newDataInputStream()
+    properties.load(inputStream)
+    inputStream.close()
+    return properties
+}
+
+private static Properties getPropertiesByPath(String dir, String configFileName) {
+
+    try {
+        Properties properties = new Properties()
+        def file = new File("${dir}/${configFileName}")
+        InputStream inputStream = file.newDataInputStream()
+        properties.load(inputStream)
+        inputStream.close()
+        return properties
+    } catch (Exception ignored) {
+        println("No such a file: ${dir}.${configFileName}, please set it up")
+    }
+}
+
+Set<String> pluginSet = new HashSet()
+project.getRootProject().getAllprojects().forEach(x -> {
+    pluginSet.add(x.getName())
+})
+
+/*
+* wyze_debug_build.properties is in version control system.
+* roku_smart_home_production_build.properties is not in version control system.
+* Properties for production release. If no roku_smart_home_production_build.properties set up, it will have an error "Password verification failed" for production release.
+*/
+
+Properties getWyzeProductionBuildProperties() {
+    Properties properties = new Properties()
+    def file = project.rootProject.file('roku_smart_home_production_build.properties')
+    if (!file.exists()) {
+        // Production keystore properties expected to be missing on dev machines, devs use the debug keystore properties
+        return getBuildProperties("wyze_release_build.properties")
+    }
+    InputStream inputStream = file.newDataInputStream()
+    properties.load(inputStream)
+    inputStream.close()
+    println("   production keystore has been set up...")
+    return properties
+}
+
+String getProductionKeystorePath() {
+    Properties properties = new Properties()
+    def fileKeyStore = project.rootProject.file('roku_smart_home_production_build.properties')
+    if (!fileKeyStore.exists()) {
+        // Production keystore path expected to be missing on dev machines, devs use the debug keystore path
+        return file(".").getAbsolutePath() + getBuildProperties("wyze_release_build.properties")['keystorePath']
+    }
+    InputStream inputStream = fileKeyStore.newDataInputStream()
+    properties.load(inputStream)
+    inputStream.close()
+    String keyStorePath = properties['keystorePath']
+    if (keyStorePath.charAt(0).toString() == ".") {
+        def keyStorePathRealPath = projectDir.getParent() + keyStorePath.substring(1)
+        return keyStorePathRealPath
+    } else {
+        return keyStorePath
+    }
+}
+
+def productionBuildProperties = getWyzeProductionBuildProperties()
+def productionKeystorePath = getProductionKeystorePath()
+def debugBuildProperties = getBuildProperties("wyze_debug_build.properties")
+def releaseBuildProperties = getBuildProperties("wyze_release_build.properties")
+def STRING_TEST_CODE_NAME_ALPHA = "\"Alpha Version\""
+def STRING_TEST_CODE_NAME_BETA = "\"Beta Version\""
+def STRING_TEST_CODE_NAME_OFFICIAL = "\"Official Version\""
+
+def STRING_SERVER_OFFICIAL = "\"Official\""
+
+def INT_VERSIONCODE = getVersionCode()
+def STRING_VERSION_NAME = getVersionName()
+def BUILD_ENV_VERSION_CODE = getVersionCode()
+
+def BRAZE_API_KEY_DEV = '"' + (System.getenv("BRAZE_KEY_OWL_ANDROID_DEV") ?: "") + '"'
+def BRAZE_API_KEY_PROD = '"' + (System.getenv("BRAZE_KEY_OWL_ANDROID_PROD") ?: "") + '"'
+
+String getVersionName() {
+    StringBuilder versionName = new StringBuilder()
+    versionName.append("\"")
+    versionName.append(project.ext["versionName"])
+    versionName.append("\"")
+    println("VersionName " + versionName)
+    println("project:" + project.getName())
+    return versionName.toString()
+}
+
+String getVersionCode() {
+    println("VersionCode " + project.ext["versionCode"])
+    return project.ext["versionCode"]
+}
+
+def appInfoProperties = getPropertiesByPath(project.projectDir.getAbsolutePath(), "build_app_info.properties")
+
+
+/*
+ * OwlAppSmarthomeAndroid --> owl-app-smarthome-android -> [owl, app, smarthome, android]
+ * Write a function to map camel string to a low case array
+ * */
+
+private static String[] getNameList(String currentProjectName) {
+    StringBuilder stringBuilder = new StringBuilder()
+    for (char c : currentProjectName.toCharArray()) {
+        char nc = Character.toLowerCase(c)
+        if (Character.isUpperCase(c)) {
+            if (stringBuilder.length() == 0) {
+                stringBuilder.append(nc)
+            } else {
+                stringBuilder.append('-').append(nc)
+            }
+        } else {
+            stringBuilder.append(nc)
+        }
+    }
+    return stringBuilder.toString().split("-")
+}
+
+private static String mapToApplicationId(String[] repoBreakDownArray) {
+    return "com." + repoBreakDownArray[0] + "." + repoBreakDownArray[1] + "." + repoBreakDownArray[2]
+}
+
+def APP_NAME = "Smart Home"
+
+private static String getApplicationId(Properties appInfoProperties, String repoName) {
+    def appId = mapToApplicationId(getNameList(repoName))
+    def applicationIdInProperty = appInfoProperties.getProperty("applicationId")
+    if (applicationIdInProperty == null || applicationIdInProperty.isEmpty()) {
+        println "getApplicationId-----> ${appId}"
+        return appId
+    } else {
+        println "getApplicationId-----> ${applicationIdInProperty}"
+        return applicationIdInProperty
+    }
+
+}
+
+def APP_ID = getApplicationId(appInfoProperties, project.getRootProject().getName())
+
+android {
+    namespace = "com.hualai"
+    compileSdk libs.versions.compileSdk.get().toInteger()
+
+    defaultConfig {
+        resValue "string", "app_name", "${APP_NAME}Beta"
+        buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+        buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_BETA)
+        buildConfigField "boolean", "isChangeServer", "true"
+        buildConfigField "boolean", "isChangeTestCode", "true"
+        buildConfigField "boolean", "isChangeChannel", "true"
+        buildConfigField("int", "VERSION_CODE", INT_VERSIONCODE)
+        buildConfigField("String", "VERSION_NAME", STRING_VERSION_NAME)
+        buildConfigField("String", "APPLICATION_ID", "\"" + "${APP_ID}" + "\"")
+        buildConfigField("String", "DEVELOP_INFO", '""')
+        buildConfigField("String", "VERSION_NAME_SUFFIX", '""')
+        buildConfigField("String", "OWL_BUILD_TPYE", '\"BUILD_TYPE_DEBUG\"')
+        applicationId APP_ID
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.targetSdk.get().toInteger()
+        versionCode project.ext["versionCode"]
+        versionName project.ext["versionName"]
+        signingConfig signingConfigs.debug
+        multiDexEnabled true
+        testInstrumentationRunner "com.roku.rokuhome.test.runner.CucumberTestRunner"
+        testBuildType System.getProperty("testBuildType", "debug")
+//        Enable the below line when using AndroidTestOrchestrator
+//        testInstrumentationRunnerArguments clearPackageData: 'true'
+//        adbOptions {
+//            installOptions '-g', '-r'
+//        }
+//        testOptions {
+//            execution 'ANDROIDX_TEST_ORCHESTRATOR'
+//        }
+        buildConfigField('boolean', 'ENABLE_REPORT_PORTAL', project.getProperties().get("reportPortal") ?: 'false')
+        buildConfigField('boolean', 'RUN_ON_DEVICE_FARM', run_on_device_farm())
+
+        /*
+        * specify output file name, fox example: Wyze-61560-2_24_1-release.aab or Wyze-61560-2_24_1-debug.apk
+        * '-release' is the build type.
+        * .apk is the file format, if we use bundle build, it will be .aab
+        * */
+        setProperty("archivesBaseName", "Roku-Smart-Home-" + versionCode + "-" + versionName.toString().replaceAll('\\.', '_'))
+
+        ndk {
+            abiFilters "arm64-v8a", "armeabi-v7a"
+        }
+        resConfigs 'en'
+
+        kapt {
+            arguments {
+                arg("AROUTER_MODULE_NAME", project.getName())
+            }
+        }
+    }
+
+    signingConfigs {
+
+        debug {
+            storeFile new File(file(".").getAbsolutePath() + debugBuildProperties['keystorePath']).getAbsoluteFile()
+            storePassword debugBuildProperties['storePassword']
+            keyAlias debugBuildProperties['keyAlias']
+            keyPassword debugBuildProperties['keyPassword']
+            v2SigningEnabled true
+        }
+
+        release {
+            storeFile new File(file(".").getAbsolutePath() + releaseBuildProperties['keystorePath']).getAbsoluteFile()
+            storePassword releaseBuildProperties['storePassword']
+            keyAlias releaseBuildProperties['keyAlias']
+            keyPassword releaseBuildProperties['keyPassword']
+            v2SigningEnabled true
+        }
+
+        productionRelease {
+            storeFile new File(productionKeystorePath).getAbsoluteFile()
+            storePassword productionBuildProperties['storePassword']
+            keyAlias productionBuildProperties['keyAlias']
+            keyPassword productionBuildProperties['keyPassword']
+            v2SigningEnabled true
+        }
+    }
+
+    buildTypes {
+        // Use these to selectively enable and disable startup actions with a manifestPlaceholders element
+        def startupItemEnabled = "androidx.startup"
+        def startupItemNotEnabled = ""
+
+        /*
+        * debug build: the only build that allows Charles to intercept app traffic.
+        * */
+        debug {
+            debuggable true
+            signingConfig signingConfigs.debug
+            versionNameSuffix ""
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\"\"")
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_DEV)
+
+            manifestPlaceholders.bugseeEnabled = startupItemEnabled
+            testCoverageEnabled = true
+        }
+
+        chucker {
+            initWith debug
+            signingConfig signingConfigs.debug
+            matchingFallbacks = ['debug']
+
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+        /*
+        * The following three build types are production release.
+        * production build: it's used by Google Play Store.
+        * signingConfig should be set up in 'roku_smart_home_production_build.properties' of the project root dir.
+        * */
+        alphaRelease {
+            debuggable false
+            initWith release
+            buildConfigField "boolean", "isChangeServer", "false"
+            buildConfigField "boolean", "isChangeTestCode", "false"
+            buildConfigField "boolean", "isChangeChannel", "false"
+            signingConfig signingConfigs.productionRelease
+            resValue "string", "app_name", "${APP_NAME}Alpha"
+            buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+            buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_ALPHA)
+            versionNameSuffix ".a${BUILD_ENV_VERSION_CODE}"
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\".a${BUILD_ENV_VERSION_CODE}\"")
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_PROD)
+            matchingFallbacks = ['release']
+
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+        betaRelease {
+            debuggable false
+            initWith release
+            buildConfigField "boolean", "isChangeServer", "false"
+            buildConfigField "boolean", "isChangeTestCode", "false"
+            buildConfigField "boolean", "isChangeChannel", "false"
+            signingConfig signingConfigs.productionRelease
+            resValue "string", "app_name", "${APP_NAME}Beta"
+            buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+
+            //Note: For beta release, the testCodeName is STRING_TEST_CODE_NAME_OFFICIAL！
+            buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_BETA)
+            versionNameSuffix ".b${BUILD_ENV_VERSION_CODE}"
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\".b${BUILD_ENV_VERSION_CODE}\"")
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_PROD)
+            matchingFallbacks = ['release']
+
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+        release {
+            debuggable true
+            initWith release
+            buildConfigField "boolean", "isChangeServer", "false"
+            buildConfigField "boolean", "isChangeTestCode", "false"
+            buildConfigField "boolean", "isChangeChannel", "false"
+            signingConfig signingConfigs.productionRelease
+            resValue "string", "app_name", "${APP_NAME}"
+            buildConfigField("String", "serverName", STRING_SERVER_OFFICIAL)
+            buildConfigField("String", "testCodeName", STRING_TEST_CODE_NAME_OFFICIAL)
+            versionNameSuffix ".${BUILD_ENV_VERSION_CODE}"
+            buildConfigField("String", "VERSION_NAME_SUFFIX", "\".${BUILD_ENV_VERSION_CODE}\"")
+            matchingFallbacks = ['release']
+            buildConfigField("String", "OWL_BUILD_TPYE", '\"BUILD_TYPE_OFFICIAL_RELEASE\"')
+            buildConfigField("String", "BRAZE_API_KEY", BRAZE_API_KEY_PROD)
+            manifestPlaceholders.bugseeEnabled = startupItemNotEnabled
+        }
+
+    }
+    packagingOptions {
+        jniLibs {
+            excludes += ['junit/runner/*', 'lib/armeabi-v7a/libaac_codec.so', 'lib/arm64-v8a/libpl_droidsonroids_gif.so', 'lib/armeabi-v7a/libpl_droidsonroids_gif.so', 'kotlin/**']
+            pickFirsts += ['lib/armeabi-v7a/libc++_shared.so', 'lib/arm64-v8a/libc++_shared.so', 'lib/armeabi-v7a/libmarsxlog.so', 'lib/arm64-v8a/libmarsxlog.so']
+        }
+        resources {
+            excludes += ['META-INF/CHANGES', 'META-INF/README.md', 'Grizzly_THIRDPARTYLICENSEREADME.txt', 'billing.properties', 'build-data.properties', 'LICENSE-junit.txt', 'junit/runner/*', 'META-INF/INDEX.LIST', 'builddef.lst', 'isoparser2-default.properties', 'version2.txt', 'places.properties', 'transport-*.properties', 'play-services-*.properties', 'META-INF/*.version', 'androidsupportmultidexversion.txt', 'firebase-*.properties', 'META-INF/*.kotlin_module', 'kotlin/**', 'META-INF/aop-ajc.xml']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    buildFeatures {
+        buildConfig = true
+        compose = true
+        dataBinding true
+        viewBinding true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.compose.kotlinCompilerVersion.get()
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+        disable 'InvalidPackage', 'Instantiatable'
+    }
+
+    preBuild.configure {
+        dependsOn installGitHook
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+configurations.configureEach {
+    resolutionStrategy {
+        force libs.junit
+    }
+}
+
+dependencies {
+    implementation(libs.bundles.androidx.compose)
+    implementation(libs.androidx.compose.activity)
+
+    // WPK
+    implementation project(":WyzeAndroidWpkAndroid")
+    implementation project(":WyzePluginEventAndroid")
+    implementation project(":WyzePluginRuleAndroid")
+
+    // hms
+    implementation project(":WyzePluginHmsAndroid")
+
+    // (Color bulb)
+    implementation project(":WyzePluginCommonlightAndroid")
+    implementation project(":HualaiPluginHlsdkAndroid")
+
+    // (Hualai setup plugin)
+    implementation project(":HualaiPluginSetupAndroid")
+
+    // (Hualai wifi plugin)
+    implementation project(":HualaiPluginWifiAndroid")
+
+    /*----------Hualai camera plugin bundle start----------*/
+
+    // (Hualai cam sdk)
+    implementation project(':TutkPluginSdkAndroid')
+
+    // camera group
+    implementation project(":HualaiPluginCamgroupAndroid")
+
+    // ( Wyze Outdoor Camera )
+    implementation project(":HualaiPluginWcoAndroid")
+
+    // ( V2 camera )
+    implementation project(":HualaiPluginCampluginsAndroid")
+
+    // ( V3 camera )
+    implementation project(":HualaiPluginCam3Android")
+
+    // doorbell
+    implementation project(":HualaiPluginDoorbelloneAndroid")
+
+    // (Socket)
+    implementation project(":HualaiPluginSocketAndroid")
+
+    // (Outdoor socket)
+    implementation project(":HualaiPluginSocketoutdoorAndroid")
+
+    // gwell
+    implementation project(":GwellPluginDoorbellAndroid")
+
+    implementation libs.androidx.startup
+
+    // bugsee - debug only
+    debugImplementation(libs.bugsee)
+
+    implementation project(':HualaiPluginGatewayAndroid')
+    implementation project(':HualaiPluginEntryAndroid')
+    implementation project(':HualaiPluginKeypadAndroid')
+    implementation project(':HualaiPluginMotionAndroid')
+
+    implementation project(":modules:common:analytics-app")
+    implementation project(":modules:common:attestation")
+    implementation project(":modules:common:core")
+    implementation project(":modules:common:device")
+    implementation project(":modules:common:device-events")
+    implementation project(":modules:common:featureflag")
+    implementation project(":modules:common:push-notification")
+    implementation project(":modules:common:user")
+    implementation project(":modules:common:ui")
+    implementation project(":modules:common:ui-core")
+    implementation project(":modules:feature:appupdate")
+    implementation project(":modules:feature:device-groups")
+    implementation project(":modules:feature:devicesetup")
+    implementation project(':modules:feature:dynamic-ui')
+    implementation project(':modules:feature:event-history')
+    implementation project(":modules:feature:inappreview")
+    implementation project(":modules:feature:indoor-plug")
+    implementation project(":modules:feature:login")
+    implementation project(":modules:feature:rules-engine")
+
+    // support
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+
+    // 加载控件 (Pull-to-refresh)
+    implementation 'in.srain.cube:ultra-ptr:1.0.11'
+
+    // ApiLevel: 17
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'joda-time:joda-time:2.9.4'
+    implementation libs.androidx.appcompat
+
+    // seekbar plugin camera
+    implementation 'com.github.warkiz.widget:indicatorseekbar:1.2.9'
+
+    // BrainTree
+    implementation 'com.google.android.instantapps:instantapps:1.1.0'
+
+    // Youtube lib
+    implementation 'com.github.PierfrancescoSoffritti:AndroidYouTubePlayer:7.0.1'
+    implementation 'com.wyze:youtubeplayer:1.0.1'
+    implementation 'com.wyze:wheelview:1.0.1'
+
+    // Add the Firebase Crashlytics SDK.
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.12'
+    implementation 'org.conscrypt:conscrypt-android:2.2.1'
+    implementation 'com.google.firebase:firebase-perf:20.2.0'
+
+    // for gif
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.19'
+
+    //doorbell extra
+    implementation 'com.github.Jay-Goo:RangeSeekBar:v2.0.6'
+    implementation 'com.lxj:xpopup:2.2.23'
+
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
+    implementation libs.hilt.work
+    kapt libs.hilt.compilerX
+
+    implementation libs.moshi
+
+    implementation "com.mikepenz:aboutlibraries:10.4.0"
+
+    // extra
+    implementation "com.daimajia.swipelayout:library:1.2.0@aar"
+    implementation 'com.github.PierfrancescoSoffritti:AndroidYouTubePlayer:7.0.1'
+
+    // wpk extra
+    kapt libs.arouter.compiler
+
+    // Media folder migration.
+    implementation 'com.google.guava:guava:30.1.1-android'
+
+    // MP4 parser. Required by HLSDK. Produces crash if removed
+    implementation libs.mp4parser.isoparser
+    implementation libs.mp4parser.muxer
+    // Required by HLSDK. Produces crash if removed
+    implementation 'org.jsoup:jsoup:1.14.2'
+
+    implementation 'com.github.getActivity:XXPermissions:16.6'
+
+    implementation libs.bundles.androidx.core
+    implementation libs.bundles.androidx.fragment
+
+    // Image to text
+    implementation 'com.google.mlkit:text-recognition:16.0.0'
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:19.0.0'
+
+    // chucker
+    def chuckerVersion = '3.5.2'
+    debugImplementation "com.github.chuckerteam.chucker:library:$chuckerVersion"
+    chuckerImplementation "com.github.chuckerteam.chucker:library:$chuckerVersion"
+    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+    alphaReleaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+    betaReleaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+    officialReleaseImplementation "com.github.chuckerteam.chucker:library-no-op:$chuckerVersion"
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0'
+
+    implementation libs.bundles.androidx.core
+    implementation libs.androidx.appcompat
+    implementation 'androidx.activity:activity-ktx:1.5.1'
+
+    implementation 'androidx.work:work-runtime:2.7.1'
+
+    // For Kotlin
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
+
+    testImplementation libs.junit
+
+    androidTestImplementation platform(libs.androidx.compose.bom)
+    androidTestImplementation libs.bundles.roku.instrumentedTest.implementation
+    androidTestImplementation(libs.androidx.test.espresso.espressoContrib) {
+        exclude module: "protobuf-lite"
+        exclude group: "org.hamcrest"
+    }
+    androidTestImplementation(libs.assertj) {
+        exclude module: "aspectjrt"
+        exclude module: "aspectjweaver"
+    }
+    androidTestImplementation(libs.reportportal.agent) {
+        exclude group: "org.aspectj", module: "aspectjrt"
+    }
+    androidTestImplementation(libs.reportportal.logback) {
+        exclude module: "aspectjrt"
+        exclude module: "xpp3"
+    }
+    androidTestUtil libs.androidx.test.orchestrator
+    debugImplementation libs.androidx.compose.ui.uiTestManifest
+    testImplementation libs.mockito.core
+}
+
+
+tasks.configureEach { task ->
+    if (task.name.toLowerCase().contains("uploadcrashlytics")) {
+        task.enabled = true
+    }
+    if (task.name ==~ /.*Test.*/) {
+        task.enabled = true
+    }
+}
+
+aboutLibraries {
+    configPath = "HualaiPluginHlsdkAndroid"
+}
+
+def run_on_device_farm() {
+    project.getProperties().get("runOnDeviceFarm") ?: 'false'
+}

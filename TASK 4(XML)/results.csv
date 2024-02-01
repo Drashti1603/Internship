@@ -1,0 +1,11 @@
+Test Name,Status,Message
+Validate Create account with Invalid email entered,passed,
+Validate Create account with Valid email entered and Invalid password,passed,
+Validate Create account with existing email entered and valid password,passed,
+Validate Create account with valid email entered and valid password,passed,
+Validate Created account is no longer to login after deleting it,passed,
+Validate Create Device Trigger Rule With Time Flag Off,passed,
+Validate Create Device Trigger Rule With Specific time Period,passed,
+Validate Discard Creation of Device Trigger Rule,passed,
+Validate Deleted Device Trigger Rule On Rule List Screen,passed,
+Validate Cancelled Device Trigger Delete Rule on Home Screen,passed,

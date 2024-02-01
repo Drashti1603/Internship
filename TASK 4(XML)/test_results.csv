@@ -1,0 +1,723 @@
+Test Name,Sub-Test Name,Status,Message,System Out
+Validate Create account with Invalid email entered,,passed,,"When Smart Home screen launched to test the login...........................passed
+Then Validate if Create an account button is displayed on Login Screen......passed
+When On Clicking ""Create an account"" button on Login Screen.................passed
+Then Validate What's your name Screen is displayed with header..............passed
+When First Name entered is Test.............................................passed
+And Last Name entered is Roku...............................................passed
+Then Validate if Continue button is Enabled.................................passed
+And Click on Continue.......................................................passed
+Then Validate What's your email Screen is displayed with header.............passed
+And Sign up Email entered ""Test"" as Email...................................passed
+And Check the terms and privacy checkbox of What’s your email Screen........passed
+Then Validate if Continue button is Enabled.................................passed
+And On Clicking ""Continue"" button on What's your email Screen...............passed
+Then Validate if Continue button is Enabled.................................passed"
+Validate Create account with Valid email entered and Invalid password,,passed,,"When Smart Home screen launched to test the login...........................passed
+Then Validate if Create an account button is displayed on Login Screen......passed
+When On Clicking ""Create an account"" button on Login Screen.................passed
+Then Validate What's your name Screen is displayed with header..............passed
+When First Name entered is Test.............................................passed
+And Last Name entered is Roku...............................................passed
+And Click on Continue.......................................................passed
+Then Validate What's your email Screen is displayed with header.............passed
+And Sign up Email entered ""hepatel+automation@roku.com"" as Email............passed
+And Check the terms and privacy checkbox of What’s your email Screen........passed
+And On Clicking ""Continue"" button on What's your email Screen...............passed
+Then Validate Choose your password Screen is displayed with header..........passed
+And Sign up password entered ""Test"" as Password.............................passed
+Then Validate if Continue button is Enabled.................................passed
+And On Clicking ""Continue"" button on Choose your password Screen............passed
+Then Validate Error alert having message ""Unable to create account.""........passed
+When On Clicking ""Ok"" button on Unable to create account Alert..............passed
+Then Validate Choose your password Screen is displayed with header..........passed"
+Validate Create account with existing email entered and valid password,,passed,,"When Smart Home screen launched to test the login...........................passed
+Then Validate if Create an account button is displayed on Login Screen......passed
+When On Clicking ""Create an account"" button on Login Screen.................passed
+Then Validate What's your name Screen is displayed with header..............passed
+When First Name entered is Test.............................................passed
+And Last Name entered is Roku...............................................passed
+And Click on Continue.......................................................passed
+Then Validate What's your email Screen is displayed with header.............passed
+And Sign up Email entered ""hepatel@roku.com"" as Email.......................passed
+And Check the terms and privacy checkbox of What’s your email Screen........passed
+And Click on Continue.......................................................passed
+Then Validate Choose your password Screen is displayed with header..........passed
+And Enter new Password......................................................passed
+Then Validate if Continue button is Enabled.................................passed
+And Click on Continue.......................................................passed
+Then Validate Error alert having message ""We found your account""............passed
+When On Clicking ""Continue to sign in"" button on We found your account pop up.passed
+Then Validate Sign in button is Disable.....................................passed"
+Validate Create account with valid email entered and valid password,,passed,,
+Validate Created account is no longer to login after deleting it,,passed,,
+Validate Create Device Trigger Rule With Time Flag Off,,passed,,
+Validate Create Device Trigger Rule With Specific time Period,,passed,,
+Validate Discard Creation of Device Trigger Rule,,passed,,
+Validate Deleted Device Trigger Rule On Rule List Screen,,passed,,
+Validate Cancelled Device Trigger Delete Rule on Home Screen,,passed,,
+Rename Device Trigger Rule and Save,,passed,,"Given Home screen displayed to test update ""TestDeviceTriggerRule"" device trigger rule.passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Check ""TestDeviceTriggerRule"" rule count on rule setting list...........passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+And Rename as ""RenameTestDeviceTriggerRule"" device trigger rule.............passed
+And Click on Save name option...............................................passed
+Then Save changes...........................................................passed
+Then Validate ""RenameTestDeviceTriggerRule"" name in the rule list...........passed
+And Wait for 1 seconds......................................................passed
+And Click on Top Left Back Button...........................................passed
+And Click on Back Button....................................................passed
+Then Navigate to Account from bottom navigation bar.........................passed
+And Navigate to Rules setting...............................................passed
+And Delete all ""RenameTestDeviceTriggerRule"" rule...........................passed"
+Rename Device Trigger Rule and Tap on yes for save,,passed,,"Given Home screen displayed to test update ""TestDeviceTriggerRule"" device trigger rule.passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Check ""TestDeviceTriggerRule"" rule count on rule setting list...........passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+And Rename as ""RenameTestDeviceTriggerRule"" device trigger rule.............passed
+And Click on Save name option...............................................passed
+And Click on Top Left Back Button...........................................passed
+Then Click on Yes to save rule changes......................................passed
+Then Validate ""RenameTestDeviceTriggerRule"" name in the rule list...........passed
+And Wait for 1 seconds......................................................passed
+And Click on Top Left Back Button...........................................passed
+And Click on Back Button....................................................passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Delete all ""TestDeviceTriggerRule"" rule.................................passed"
+Rename Device Trigger Rule and Cancel Save,,passed,,"Given Home screen displayed to test update ""TestDeviceTriggerRule"" device trigger rule.passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Check ""TestDeviceTriggerRule"" rule count on rule setting list...........passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+And Rename as ""RenameTestDeviceTriggerRule"" device trigger rule.............passed
+And Click on Save name option...............................................passed
+And Click on Top Left Back Button...........................................passed
+Then Discard the changes by clicking No.....................................passed
+Then Validate ""TestDeviceTriggerRule"" name in the rule list.................passed
+And Click on Top Left Back Button...........................................passed
+And Click on Back Button....................................................passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Wait for 1 seconds......................................................passed
+And Delete all ""TestDeviceTriggerRule"" rule.................................passed"
+Update Action in Device Trigger Rule and Save,,passed,,"Given Home screen displayed to test update ""TestDeviceTriggerRule"" device trigger rule.passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Check ""TestDeviceTriggerRule"" rule count on rule setting list...........passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+And Delete ""Mute notifications"" device trigger action.......................passed
+And Click dialog delete button..............................................passed
+And Click on add plus icon for Action option................................passed
+And Add action to un-mute notification......................................passed
+And Save changes............................................................passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+Then Validate ""Mute notifications"" action removed from the edit rule screen.passed
+Then Validate ""Unmute notifications"" action on the edit rule screen.........passed
+And Wait for 1 seconds......................................................passed
+And Click on Delete Device Trigger rule Button..............................passed
+And Click dialog delete button..............................................passed"
+Add New Action in Device Trigger Rule and Save,,passed,,"Given Home screen displayed to test update ""TestDeviceTriggerRule"" device trigger rule.passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Check ""TestDeviceTriggerRule"" rule count on rule setting list...........passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+And Click on add plus icon for Action option................................passed
+And Add action to un-mute notification......................................passed
+And Save changes............................................................passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+Then Validate ""Mute notifications"" action on the edit rule screen...........passed
+Then Validate ""Unmute notifications"" action on the edit rule screen.........passed
+And Wait for 1 seconds......................................................passed
+And Click on Delete Device Trigger rule Button..............................passed
+And Click dialog delete button..............................................passed"
+Add New Action in Device Trigger Rule and Save using back button,,passed,,"Given Home screen displayed to test update ""TestDeviceTriggerRule"" device trigger rule.passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Check ""TestDeviceTriggerRule"" rule count on rule setting list...........passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+And Click on add plus icon for Action option................................passed
+And Add action to un-mute notification......................................passed
+And Click on Top Left Back Button...........................................passed
+Then Click on Yes to save rule changes......................................passed
+And Wait for 2 seconds......................................................passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+Then Validate ""Mute notifications"" action on the edit rule screen...........passed
+Then Validate ""Unmute notifications"" action on the edit rule screen.........passed
+And Wait for 1 seconds......................................................passed
+And Click on Delete Device Trigger rule Button..............................passed
+And Click dialog delete button..............................................passed"
+Add New Action in Device Trigger Rule and Cancel Save,,passed,,"Given Home screen displayed to test update ""TestDeviceTriggerRule"" device trigger rule.passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Check ""TestDeviceTriggerRule"" rule count on rule setting list...........passed
+And Wait for 1 seconds......................................................passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+And Click on add plus icon for Action option................................passed
+And Add action to un-mute notification......................................passed
+And Click on Top Left Back Button...........................................passed
+Then Discard the changes by clicking No.....................................passed
+And Wait for 1 seconds......................................................passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+Then Validate ""UnMute notifications"" action removed from the edit rule screen.passed
+Then Validate ""mute notifications"" action on the edit rule screen...........passed
+And Wait for 1 seconds......................................................passed
+And Click on Delete Device Trigger rule Button..............................passed
+And Click dialog delete button..............................................passed"
+Validate Enable-Disable Device Trigger Rule,,passed,,"Given Home screen displayed to test update ""TestDeviceTriggerRule"" device trigger rule.passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Check ""TestDeviceTriggerRule"" rule count on rule setting list...........passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+Then Click on Turn on/off toggle Button.....................................passed
+And Save changes............................................................passed
+Then Validate rule is disabled..............................................passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+Then Click on Turn on/off toggle Button.....................................passed
+And Save changes............................................................passed
+Then Validate rule is enabled...............................................passed
+And Wait for 1 seconds......................................................passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+And Click on Delete Device Trigger rule Button..............................passed
+And Click dialog delete button..............................................passed"
+Update Trigger Action as Turns On Device Trigger Rule and Save,,passed,,
+Validate update Device Trigger Rule as turn on Time flag,,passed,,"Given Home screen displayed to test update ""TestDeviceTriggerRule"" device trigger rule.passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Check ""TestDeviceTriggerRule"" rule count on rule setting list...........passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+And Click on custom time toggle button......................................passed
+And Set custom time.........................................................passed
+And Save changes............................................................passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+And Scroll up to validate time flag.........................................passed
+Then Validate time flag is enabled on the device trigger edit rule screen...passed
+And Wait for 1 seconds......................................................passed
+And Click on Delete Device Trigger rule Button..............................passed
+And Click dialog delete button..............................................passed"
+Validate update Device Trigger Rule as turn off Time flag,,passed,,"Given Home screen displayed to test update ""TestDeviceTriggerRule"" device trigger rule.passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+And Click on custom time toggle button......................................passed
+And Set custom time.........................................................passed
+And Save changes............................................................passed
+And Select ""TestDeviceTriggerRule"" Rule from list...........................passed
+And Wait for 1 seconds......................................................passed
+And Click on custom time toggle button......................................passed
+And Save changes............................................................passed
+And Select ""TestDeviceTriggerRule"" Rule from list...........................passed
+And Scroll up to validate time flag.........................................passed
+And Wait for 1 seconds......................................................passed
+Then Validate time flag is disabled on the device trigger edit rule screen..passed
+And Wait for 1 seconds......................................................passed
+And Click on Delete Device Trigger rule Button..............................passed
+And Click dialog delete button..............................................passed"
+Validate Multiple update in Device Trigger Rule and Save,,passed,,"Given Home screen displayed to test update ""TestDeviceTriggerRule"" device trigger rule.passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+Then Click on Turn on/off toggle Button.....................................passed
+And Click on custom time toggle button......................................passed
+And Set custom time.........................................................passed
+And Save changes............................................................passed
+Then Validate rule is disabled..............................................passed
+Then Select ""TestDeviceTriggerRule"" Rule from list..........................passed
+Then Validate time flag is enabled on the device trigger edit rule screen...passed
+And Wait for 1 seconds......................................................passed
+And Click on Delete Device Trigger rule Button..............................passed
+And Click dialog delete button..............................................passed"
+Verify Indoor Camera On-boarding with resetting the plug via USB relay,,passed,,
+Verify Indoor Camera Live view - Video Type as HD feature,,passed,,"Given User should be signed in..............................................passed
+Then Validate ""Indoor Camera"" device name on home screen....................passed
+And Click on Onboarded device name as ""Indoor Camera"".......................passed
+Then Validate ""Indoor Camera"" name in Live-view screen......................passed
+And Click on video type as HD...............................................passed
+Then Validate ""HD"" video type is selected on Live view screen...............passed"
+Verify Indoor Camera Live view - Video Type from HD to SD feature,,passed,,"Given User should be signed in..............................................passed
+Then Validate ""Indoor Camera"" device name on home screen....................passed
+And Click on Onboarded device name as ""Indoor Camera"".......................passed
+Then Validate ""Indoor Camera"" name in Live-view screen......................passed
+And Click on video type as SD...............................................passed
+Then Validate ""SD"" video type is selected on Live view screen...............passed"
+Verify Indoor Camera Live view - Video Type from SD to 360p feature,,passed,,"Given User should be signed in..............................................passed
+Then Validate ""Indoor Camera"" device name on home screen....................passed
+And Click on Onboarded device name as ""Indoor Camera"".......................passed
+Then Validate ""Indoor Camera"" name in Live-view screen......................passed
+And Click on video type as 360p.............................................passed
+Then Validate ""360p"" video type is selected on Live view screen.............passed"
+Verify Indoor Camera Live view - Night vision mode as Auto feature,,passed,,"Given User should be signed in..............................................passed
+Then Validate ""Indoor Camera"" device name on home screen....................passed
+And Click on Onboarded device name as ""Indoor Camera"".......................passed
+Then Validate ""Indoor Camera"" name in Live-view screen......................passed
+Then Validate Auto mode is selected for night vision........................passed"
+Verify Indoor Camera Live view - Night vision mode From Auto to On feature,,passed,,"Given User should be signed in..............................................passed
+Then Validate ""Indoor Camera"" device name on home screen....................passed
+And Click on Onboarded device name as ""Indoor Camera"".......................passed
+Then Validate ""Indoor Camera"" name in Live-view screen......................passed
+And Click on Night Vision mode..............................................passed
+Then Validate On mode is selected for night vision..........................passed"
+Verify Indoor Camera Live view - Night vision mode From On to Off feature,,passed,,"Given User should be signed in..............................................passed
+Then Validate ""Indoor Camera"" device name on home screen....................passed
+And Click on Onboarded device name as ""Indoor Camera"".......................passed
+Then Validate ""Indoor Camera"" name in Live-view screen......................passed
+And Click on Night Vision mode..............................................passed
+Then Validate Off mode is selected for night vision.........................passed"
+Verify Indoor Camera Live view validation feature,,passed,,"Given User should be signed in..............................................passed
+Then Validate ""Indoor Camera"" device name on home screen....................passed
+And Click on ""Indoor Camera"" device.........................................passed
+Then Validate ""Indoor Camera"" name in Live-view screen......................passed
+Then Take a screenshot of Live view and validate it.........................passed"
+Verify Indoor Camera Live view Snapshot validation feature,,passed,,"Given User should be signed in..............................................passed
+Then Validate ""Indoor Camera"" device name on home screen....................passed
+And Click on ""Indoor Camera"" device.........................................passed
+And Delete all Previous images or videos....................................passed
+Then Validate ""Indoor Camera"" name in Live-view screen......................passed
+And Click on Take photo.....................................................passed
+And Click on More option....................................................passed
+And Click on Album option...................................................passed
+And Click on Photos option..................................................passed
+Then Extract text from image................................................passed
+Then Delete all images or videos............................................passed"
+Verify Indoor Camera Live view Recording feature,,passed,,"Given User should be signed in..............................................passed
+Then Validate ""Indoor Camera"" device name on home screen....................passed
+And Click on ""Indoor Camera"" device.........................................passed
+Then Validate ""Indoor Camera"" name in Live-view screen......................passed
+And Click on Record button to start capture video...........................passed
+And Click on More option....................................................passed
+And Click on Album option...................................................passed
+And Click on Videos option..................................................passed
+Then Validate ""Recording"" text for videos on videos screen..................passed
+Then Delete all images or videos............................................passed"
+Validate indoor camera on/off status and delete the camera,,passed,,
+Validate plug on-boarding with resetting the plug via USB relay,,passed,,
+Validate location trigger rule save button is disabled,,passed,,"Given Home screen displayed to test create ""TestLocationTriggerRule"" rule...passed
+When Click on Plus sign.....................................................passed
+And Click on add rule option................................................passed
+And Click on location trigger rule option...................................passed
+Then Location trigger rule save button disabled.............................passed"
+Validate location trigger rule save button is disabled if only name is entered,,passed,,"Given Home screen displayed to test create ""TestLocationTriggerRule"" rule...passed
+When Click on Plus sign.....................................................passed
+And Click on add rule option................................................passed
+And Click on location trigger rule option...................................passed
+And Click on location trigger rule name option..............................passed
+And Click on location trigger rule name text option.........................passed
+And Set location trigger rule name as ""TestLocationTriggerRule"".............passed
+And Click on location trigger name save button option.......................passed
+Then Location trigger rule save button disabled.............................passed"
+Validate location trigger rule save button is enabled when require values are entered,,passed,,"Given Home screen displayed to test create ""TestLocationTriggerRule"" rule...passed
+And Click on Plus sign......................................................passed
+And Click on add rule option................................................passed
+And Click on location trigger rule option...................................passed
+And Click on When I Enter option............................................passed
+And Click on set location option............................................passed
+And Wait for 2 seconds......................................................passed
+And Click on current location option........................................passed
+And Click on set location save button option................................passed
+And Click on add action.....................................................passed
+And Add action to mute notification.........................................passed
+Then Location trigger rule save button enabled..............................passed"
+"Validate cancel create ""When I enter"" location trigger rule with Time flag is Off",,passed,,"Given Home screen displayed to test create ""TestLocationTriggerRule"" rule...passed
+When Click on Plus sign.....................................................passed
+And Click on add rule option................................................passed
+And Click on location trigger rule option...................................passed
+And Click on location trigger rule name option..............................passed
+And Click on location trigger rule name text option.........................passed
+And Set location trigger rule name as ""TestLocationTriggerRule"".............passed
+And Click on location trigger name save button option.......................passed
+And Click on When I Enter option............................................passed
+And Click on set location option............................................passed
+And Wait for 2 seconds......................................................passed
+And Click on current location option........................................passed
+And Click on set location save button option................................passed
+And Click on add action.....................................................passed
+And Add action to mute notification.........................................passed
+And Click on Top Left Back Button...........................................passed
+And Click on discard option.................................................passed
+And Click on Cancel Button..................................................passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+Then Validate ""TestLocationTriggerRule"" rule list after cancel rule.........passed
+And Delete all ""TestLocationTriggerRule"" rule...............................passed"
+"Validate cancel create ""When I enter"" location trigger rule with Time flag is On",,passed,,"Given Home screen displayed to test create ""TestLocationTriggerRule"" rule...passed
+When Click on Plus sign.....................................................passed
+And Click on add rule option................................................passed
+And Click on location trigger rule option...................................passed
+And Click on location trigger rule name option..............................passed
+And Click on location trigger rule name text option.........................passed
+And Set location trigger rule name as ""TestLocationTriggerRule"".............passed
+And Click on location trigger name save button option.......................passed
+And Click on When I Enter option............................................passed
+And Click on set location option............................................passed
+And Wait for 2 seconds......................................................passed
+And Click on current location option........................................passed
+And Click on set location save button option................................passed
+And Click on add action.....................................................passed
+And Add action to mute notification.........................................passed
+And Click on custom time toggle button......................................passed
+And Set custom time.........................................................passed
+And Click on Top Left Back Button...........................................passed
+And Click on discard option.................................................passed
+And Click on Cancel Button..................................................passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+Then Validate ""TestLocationTriggerRule"" rule list after cancel rule.........passed
+And Delete all ""TestLocationTriggerRule"" rule...............................passed"
+"Validate create ""When I enter"" location trigger rule with Time flag is Off and save",,passed,,
+"Validate create ""When I enter"" location trigger rule with Time flag is On and save",,passed,,"Given Home screen displayed to test create ""TestLocationTriggerRule"" rule...passed
+When Click on Plus sign.....................................................passed
+And Click on add rule option................................................passed
+And Click on location trigger rule option...................................passed
+And Click on location trigger rule name option..............................passed
+And Click on location trigger rule name text option.........................passed
+And Set location trigger rule name as ""TestLocationTriggerRule"".............passed
+And Click on location trigger name save button option.......................passed
+And Click on When I Enter option............................................passed
+And Click on set location option............................................passed
+And Wait for 2 seconds......................................................passed
+And Click on current location option........................................passed
+And Click on set location save button option................................passed
+And Click on add action.....................................................passed
+And Add action to mute notification.........................................passed
+And Click on custom time toggle button......................................passed
+And Set custom time.........................................................passed
+And Click on save trigger rule option.......................................passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+Then Validate ""TestLocationTriggerRule"" name in rule list...................passed
+And Delete all ""TestLocationTriggerRule"" rule...............................passed"
+"Validate create ""When I exit"" location trigger rule with Time flag is Off and Save",,passed,,
+"Validate create ""When I exit"" location trigger rule with Time flag is On and Save",,passed,,"Given Home screen displayed to test create ""TestLocationTriggerRule"" rule...passed
+When Click on Plus sign.....................................................passed
+And Click on add rule option................................................passed
+And Click on location trigger rule option...................................passed
+And Click on location trigger rule name option..............................passed
+And Click on location trigger rule name text option.........................passed
+And Set location trigger rule name as ""TestLocationTriggerRule"".............passed
+And Click on location trigger name save button option.......................passed
+And Click on When I Exit option.............................................passed
+And Click on set location option............................................passed
+And Wait for 2 seconds......................................................passed
+And Click on current location option........................................passed
+And Click on set location save button option................................passed
+And Click on add action.....................................................passed
+And Add action to mute notification.........................................passed
+And Click on custom time toggle button......................................passed
+And Set custom time.........................................................passed
+And Click on save trigger rule option.......................................passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+Then Validate ""TestLocationTriggerRule"" name in rule list...................passed
+And Delete all ""TestLocationTriggerRule"" rule...............................passed"
+"Validate cancel create ""When I exit"" location trigger rule with Time flag is Off",,passed,,"Given Home screen displayed to test create ""TestLocationTriggerRule"" rule...passed
+When Click on Plus sign.....................................................passed
+And Click on add rule option................................................passed
+And Click on location trigger rule option...................................passed
+And Click on location trigger rule name option..............................passed
+And Click on location trigger rule name text option.........................passed
+And Set location trigger rule name as ""TestLocationTriggerRule"".............passed
+And Click on location trigger name save button option.......................passed
+And Click on When I Exit option.............................................passed
+And Click on set location option............................................passed
+And Wait for 2 seconds......................................................passed
+And Click on current location option........................................passed
+And Click on set location save button option................................passed
+And Click on add action.....................................................passed
+And Add action to mute notification.........................................passed
+And Click on Top Left Back Button...........................................passed
+And Click on discard option.................................................passed
+And Click on Cancel Button..................................................passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+Then Validate ""TestLocationTriggerRule"" rule list after cancel rule.........passed
+And Delete all ""TestLocationTriggerRule"" rule...............................passed"
+"Validate cancel create ""When I exit"" location trigger rule with Time flag is On",,passed,,"Given Home screen displayed to test create ""TestLocationTriggerRule"" rule...passed
+When Click on Plus sign.....................................................passed
+And Click on add rule option................................................passed
+And Click on location trigger rule option...................................passed
+And Click on location trigger rule name option..............................passed
+And Click on location trigger rule name text option.........................passed
+And Set location trigger rule name as ""TestLocationTriggerRule"".............passed
+And Click on location trigger name save button option.......................passed
+And Click on When I Exit option.............................................passed
+And Click on set location option............................................passed
+And Wait for 2 seconds......................................................passed
+And Click on current location option........................................passed
+And Click on set location save button option................................passed
+And Click on add action.....................................................passed
+And Add action to mute notification.........................................passed
+And Click on custom time toggle button......................................passed
+And Set custom time.........................................................passed
+And Click on Top Left Back Button...........................................passed
+And Click on discard option.................................................passed
+And Click on Cancel Button..................................................passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+Then Validate ""TestLocationTriggerRule"" rule list after cancel rule.........passed
+And Delete all ""TestLocationTriggerRule"" rule...............................passed"
+Validate disable location trigger rule with Time flag is On,,passed,,"Given Home screen displayed to test update ""TestLocationTriggerRule"" location trigger rule.passed
+When Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Check ""TestLocationTriggerRule"" rule count on rule setting list.........passed
+Then Select ""TestLocationTriggerRule"" Rule from list........................passed
+Then Click on Turn on/off toggle Button.....................................passed
+And Save changes............................................................passed
+Then Validate rule is disabled..............................................passed
+Then Select ""TestLocationTriggerRule"" Rule from list........................passed
+Then Click on Turn on/off toggle Button.....................................passed
+And Save changes............................................................passed
+Then Validate rule is enabled...............................................passed
+And Delete all ""TestLocationTriggerRule"" rule...............................passed"
+Validate disable location trigger rule with Time flag is Off,,passed,,"Given Home screen displayed to test update ""TestLocationTriggerRule"" location trigger rule.passed
+When Navigate to Account from bottom navigation bar.........................passed
+And Navigate to Rules setting...............................................passed
+Then Check ""TestLocationTriggerRule"" rule count on rule setting list........passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Click on Turn on/off toggle Button......................................passed
+And Save changes............................................................passed
+Then Validate rule is disabled..............................................passed
+Then Select ""TestLocationTriggerRule"" Rule from list........................passed
+Then Click on Turn on/off toggle Button.....................................passed
+And Save changes............................................................passed
+Then Validate rule is enabled...............................................passed
+And Delete all ""TestLocationTriggerRule"" rule...............................passed"
+Validate delete location trigger rule,,passed,,"Given Home screen displayed to test delete ""TestLocationTriggerRule"" location trigger rule.passed
+When Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Check ""TestLocationTriggerRule"" rule count on rule setting list.........passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Click on Delete location rule Button....................................passed
+And Click on delete option..................................................passed
+And Click on Top Left Back Button...........................................passed
+Then Validate ""TestLocationTriggerRule"" is deleted from rule list...........passed
+And Delete all ""TestLocationTriggerRule"" rule...............................passed"
+Validate cancel delete location trigger rule and validate rule screen,,passed,,"Given Home screen displayed to test delete ""TestLocationTriggerRule"" location trigger rule.passed
+When Navigate to Account from bottom navigation bar.........................passed
+And Navigate to Rules setting...............................................passed
+And Check ""TestLocationTriggerRule"" rule count on rule setting list.........passed
+Then Select ""TestLocationTriggerRule"" Rule from list........................passed
+And Click on Delete location rule Button....................................passed
+And Click on Cancel rule Button.............................................passed
+And Click on Back Button....................................................passed
+Then Validate ""TestLocationTriggerRule"" rule list after cancel rule.........passed
+And Delete all ""TestLocationTriggerRule"" rule...............................passed"
+Validate cancel delete location trigger rule by pressing back button and validate rule screen,,passed,,"Given Home screen displayed to test delete ""TestLocationTriggerRule"" location trigger rule.passed
+When Navigate to Account from bottom navigation bar.........................passed
+And Navigate to Rules setting...............................................passed
+Then Check ""TestLocationTriggerRule"" rule count on rule setting list........passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Click on Delete location rule Button....................................passed
+And Wait for 1 seconds......................................................passed
+And Click on Back Button....................................................passed
+And Click on Top Left Back Button...........................................passed
+Then Validate ""TestLocationTriggerRule"" rule list after cancel rule.........passed
+And Delete all ""TestLocationTriggerRule"" rule...............................passed"
+"Validate rename location trigger rule, click on cancel button",,passed,,"Given Home screen displayed to test update ""TestLocationTriggerRule"" location trigger rule.passed
+When Navigate to Account from bottom navigation bar.........................passed
+And Navigate to Rules setting...............................................passed
+Then Check ""TestLocationTriggerRule"" rule count on rule setting list........passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Rename location trigger as ""NewTestLocationTriggerRule"" rule............passed
+And Click on Cancel rule Button.............................................passed
+And Click on Top Left Back Button...........................................passed
+Then Validate ""NewTestLocationTriggerRule"" rule name is not available in the rule list.passed
+And Click on Top Left Back Button...........................................passed
+And Wait for 1 seconds......................................................passed
+And Click on Back Button....................................................passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+And Delete all ""TestLocationTriggerRule"" rule...............................passed"
+Validate rename rule location trigger,,passed,,"Given Home screen displayed to test update ""TestLocationTriggerRule"" location trigger rule.passed
+When Validate Home screen...................................................passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+Then Check ""TestLocationTriggerRule"" rule count on rule setting list........passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Rename location trigger as ""NewTestLocationTriggerRule"" rule............passed
+And Save location trigger rule name.........................................passed
+And Save changes............................................................passed
+Then Validate ""NewTestLocationTriggerRule"" name in the rule list............passed
+And Wait for 1 seconds......................................................passed
+And Click on Top Left Back Button...........................................passed
+And Wait for 1 seconds......................................................passed
+And Click on Back Button....................................................passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Delete all ""NewTestLocationTriggerRule"" rule............................passed"
+"Validate rename rule location trigger, Press top left back button and save changes",,passed,,"Given Home screen displayed to test update ""TestLocationTriggerRule"" location trigger rule.passed
+When Validate Home screen...................................................passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+Then Check ""TestLocationTriggerRule"" rule count on rule setting list........passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Rename location trigger as ""NewTestLocationTriggerRule"" rule............passed
+And Save location trigger rule name.........................................passed
+And Click on Top Left Back Button...........................................passed
+And Click on Yes to save rule changes.......................................passed
+Then Validate ""NewTestLocationTriggerRule"" name in the rule list............passed
+And Wait for 1 seconds......................................................passed
+And Click on Top Left Back Button...........................................passed
+And Wait for 1 seconds......................................................passed
+And Click on Back Button....................................................passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+And Delete all ""NewTestLocationTriggerRule"" rule............................passed"
+"Validate rename location trigger rule, Press back button and discards the changes",,passed,,"Given Home screen displayed to test update ""TestLocationTriggerRule"" location trigger rule.passed
+When Validate Home screen...................................................passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+Then Check ""TestLocationTriggerRule"" rule count on rule setting list........passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Rename location trigger as ""NewTestLocationTriggerRule"" rule............passed
+And Save location trigger rule name.........................................passed
+And Click on Top Left Back Button...........................................passed
+And Discard the changes by clicking No......................................passed
+Then Validate ""NewTestLocationTriggerRule"" rule name is not available in the rule list.passed
+And Click on Top Left Back Button...........................................passed
+And Wait for 1 seconds......................................................passed
+And Click on Back Button....................................................passed
+Then Navigate to Account from bottom navigation bar.........................passed
+Then Navigate to Rules setting..............................................passed
+And Delete all ""TestLocationTriggerRule"" rule...............................passed"
+Validate update action in location trigger Rule and Save,,passed,,"Given Home screen displayed to test update ""TestLocationTriggerRule"" location trigger rule.passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Scroll up and click on add action button................................passed
+And Wait for 1 seconds......................................................passed
+And Add action to un-mute notification......................................passed
+And Delete ""Mute notifications"" action......................................passed
+And Click dialog delete button..............................................passed
+And Save changes............................................................passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Scroll up to validate action............................................passed
+Then Validate ""Mute notifications"" action removed from the edit rule screen.passed
+Then Validate ""Un-mute notifications"" action on the edit rule screen........passed
+And Click on Delete location rule Button....................................passed
+And Click dialog delete button..............................................passed"
+Validate add new action in location trigger Rule and Save,,passed,,"Given Home screen displayed to test update ""TestLocationTriggerRule"" location trigger rule.passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+And Wait for 1 seconds......................................................passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Scroll up and click on add action button................................passed
+And Wait for 1 seconds......................................................passed
+And Add action to un-mute notification......................................passed
+And Save changes............................................................passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Scroll up to validate action............................................passed
+Then Validate ""Mute notifications"" action on the edit rule screen...........passed
+Then Validate ""Un-mute notifications"" action on the edit rule screen........passed
+And Click on Delete location rule Button....................................passed
+And Click dialog delete button..............................................passed"
+"Validate updating trigger as ""When I exit"" action into Location Trigger Rule",,passed,,"Given Home screen displayed to test update ""TestLocationTriggerRule"" location trigger rule with trigger ""When I Enter"".passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Click on When I Exit option.............................................passed
+And Save changes............................................................passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+Then Validate ""When I Exit"" trigger on the edit location trigger rule screen.passed
+And Click on Delete location rule Button....................................passed
+And Click dialog delete button..............................................passed"
+"Validate updating trigger as ""When I Enter"" action into Location Trigger Rule",,passed,,"Given Home screen displayed to test update ""TestLocationTriggerRule"" location trigger rule with trigger ""When I Exit"".passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Click on When I Enter option............................................passed
+And Save changes............................................................passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+Then Validate ""When I Enter"" trigger on the edit location trigger rule screen.passed
+And Click on Delete location rule Button....................................passed
+And Click dialog delete button..............................................passed"
+Validate update Location Trigger Rule as turn on Time flag,,passed,,"Given Home screen displayed to test update ""TestLocationTriggerRule"" location trigger rule.passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Click on custom time toggle button......................................passed
+And Save changes............................................................passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Scroll up to validate time flag.........................................passed
+Then Validate time flag is enabled on the edit rule screen..................passed
+And Wait for 1 seconds......................................................passed
+And Click on Delete location rule Button....................................passed
+And Click dialog delete button..............................................passed"
+Validate update Location Trigger Rule as turn off Time flag,,passed,,"Given Home screen displayed to test update ""TestLocationTriggerRule"" location trigger rule with trigger ""When I Enter"".passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Wait for 1 seconds......................................................passed
+And Click on custom time toggle button......................................passed
+And Save changes............................................................passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Scroll up to validate time flag.........................................passed
+Then Validate time flag is disabled on the edit rule screen.................passed
+And Wait for 1 seconds......................................................passed
+And Click on Delete location rule Button....................................passed
+And Click dialog delete button..............................................passed"
+Validate delete action and add new action in location trigger rule,,passed,,"Given Home screen displayed to test update ""TestLocationTriggerRule"" location trigger rule.passed
+And Navigate to Account from bottom navigation bar..........................passed
+And Navigate to Rules setting...............................................passed
+And Wait for 1 seconds......................................................passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Scroll up to validate action............................................passed
+And Delete ""Mute notifications"" action......................................passed
+And Click dialog delete button..............................................passed
+And Click on add action.....................................................passed
+And Wait for 1 seconds......................................................passed
+And Add action to un-mute notification......................................passed
+And Save changes............................................................passed
+And Select ""TestLocationTriggerRule"" Rule from list.........................passed
+And Scroll up to validate action............................................passed
+Then Validate ""Mute notifications"" action removed from the edit rule screen.passed
+Then Validate ""Un-mute notifications"" action on the edit rule screen........passed
+And Click on Delete location rule Button....................................passed
+And Click dialog delete button..............................................passed"
+Validate add new action in location trigger Rule and Save using back button,,passed,,
+Validate add new action in location trigger Rule and Cancel Save,,passed,,
+Navigate to rule and click on back button in location trigger rule,,passed,,
+Navigate to rule and save without changing in location trigger rule,,passed,,
+Validate schedule rule save button is disable,,passed,,
+Validate create schedule rule,,passed,,
+Validate cancel create schedule rule,,passed,,
+Validate cancel delete schedule rule by clicking cancel button,,passed,,
+Validate cancel delete schedule rule using back press,,passed,,
+Delete schedule rule,,passed,,
+Validate rename schedule rule,,passed,,
+"Validate rename schedule rule, Press back button and discards the changes",,passed,,
+"Validate rename schedule rule, click on cancel button and discards the changes",,passed,,
+Update Action in schedule Rule and Save,,passed,,
+Add New Action in schedule Rule and Save,,passed,,
+Delete action and add new action in schedule rule,,passed,,
+Add New Action in schedule Rule and Save using back button,,passed,,
+Add New Action in schedule Rule and Cancel Save,,passed,,
+Navigate to rule and click on back button in schedule rule,,passed,,
+Navigate to rule and save without changing in schedule rule,,passed,,
+"Validate execute Shortcut rule to ""Turn on"" Wyze Indoor plug",,passed,,
+"Validate execute Shortcut rule to ""Turn off"" Wyze Indoor plug",,passed,,
+"Validate execute Shortcut rule to ""Turn on"" Wyze Indoor Camera",,passed,,
+"Validate execute Shortcut rule to ""Turn off"" Wyze Indoor camera",,passed,,
+"Validate execute Shortcut rule to ""Turn off notification"" for Wyze Indoor Camera",,passed,,
+"Validate execute Shortcut rule to ""Turn on notification"" for Wyze Indoor Camera",,passed,,
+Validate create shortcut rule,,passed,,
+Validate cancel create shortcut rule,,passed,,
+Cancel delete rule and validate home screen,,passed,,
+Cancel delete rule by pressing back button and validate home screen,,passed,,
+Delete rule and validate home screen,,passed,,
+"Rename rule, Press back button and save changes",,passed,,
+Rename rule,,passed,,
+"Rename rule, Press back button and discards the changes",,passed,,
+Update Action in Shortcut Rule and Save,,passed,,
+Add New Action in Shortcut Rule and Save,,passed,,
+Delete action and add new action,,passed,,
+Add New Action in Shortcut Rule and Save using back button,,passed,,
+Add New Action in Shortcut Rule and Cancel Save,,passed,,
+Navigate to rule and click on back button,,passed,,
+Navigate to rule and save without changing,,passed,,
+Validate enabled sign in button,,passed,,
+Validate account Sign in,,passed,,
+Validate sign out button,,passed,,
+Validate account with cancel sign out,,passed,,
+Validate account sign out,,passed,,
