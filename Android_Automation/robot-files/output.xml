@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.0 (Python 3.8.10 on linux)" generated="2024-02-01T16:34:19.565145" rpa="false" schemaversion="5">
+<suite id="s1" name="Csv" source="/home/drashti/Documents/Android_Automation/robot-files/Web_Automation/csv.robot">
+<test id="s1-t1" name="Search and Extract Product Details" line="14">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:20.088357" level="INFO">Opening browser 'chrome' to base url 'https://www.amazon.com'.</msg>
+<arg>${URL}</arg>
+<arg>chrome</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2024-02-01T16:34:20.084431" elapsed="3.845744"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2024-02-01T16:34:23.939403" elapsed="0.182281"/>
+</kw>
+<kw name="Set Selenium Implicit Wait" owner="SeleniumLibrary">
+<arg>20 seconds</arg>
+<doc>Sets the implicit wait value used by Selenium.</doc>
+<status status="PASS" start="2024-02-01T16:34:24.124890" elapsed="0.019056"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:24.158215" level="INFO">Typing text 'laptop' into text field '//*[@id="twotabsearchtextbox"]'.</msg>
+<arg>//*[@id="twotabsearchtextbox"]</arg>
+<arg>${SEARCH_QUERY}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:24.150642" elapsed="0.354026"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:24.508650" level="INFO">Clicking element '//*[@id="nav-search-submit-button"]'.</msg>
+<arg>//*[@id="nav-search-submit-button"]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:24.506912" elapsed="2.435765"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_LIST}</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2024-02-01T16:34:26.945130" elapsed="0.057866"/>
+</kw>
+<kw name="Get WebElements" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:27.027633" level="INFO">@{product_details} = [ &lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_325")&gt; | &lt;selenium.webdriver.remote.webelement.WebElem...</msg>
+<var>@{product_details}</var>
+<arg>//div[starts-with(@data-component-type,'s-search-result')]</arg>
+<doc>Returns a list of WebElement objects matching the ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.005028" elapsed="0.023149"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.110375" level="INFO">Sponsored
+V15 Gen 4 Laptop, 15.6" FHD Display, AMD Ryzen 3 7320U Processor, Long Battery Life, RJ-45, USB-C, HDMI, w/WOWPC Bundle, Windows 11 Pro (16GB RAM | 1TB PCIe SSD)
+Options:
+8 capacities
+11
+100+ bought in past month
+$429
+00
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.038219" elapsed="0.072824"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_325")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.035615" elapsed="0.075881"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.222108" level="INFO">Sponsored
+jumper Laptop, 12th Quad-Core Intel N100(Up to 3.4G), 16GB DDR5 512GB SSD, Laptops Computer with 16" FHD IPS Screen(1920X1200), 38Wh Battery, Cooling System, 2.4G/5G WiFi, BT4.0, Type-C, HD Webcam.
+7
+200+ bought in past month
+Limited time deal
+$379
+99 Typical:
+$759.99
+Save $80.00 with coupon
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.113510" elapsed="0.109555"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_326")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.112302" elapsed="0.111499"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.341837" level="INFO">ASUS Vivobook Go 12 L210 11.6” ultra-thin laptop, 2022 version, Intel Celeron N4020, 4GB RAM, 64GB eMMC, Win 11 Home in S mode with One Year of Office 365 Personal, L210MA-DS02
+898
+500+ bought in past month
+$169
+99 List:
+$219.99
+Delivery Wed, Feb 21
+Ships to India
+More Buying Choices
+$106.83(51 used &amp; new offers)</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.226249" elapsed="0.116140"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_327")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.225009" elapsed="0.117757"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.383394" level="INFO">IdeaPad 1 15.6" FHD Laptop, 12th Gen Intel Core i3-1215U 6-Core Processor, 16GB DDR4 Memory, 1TB PCIe SSD, SD Card Reader, HDMI, Webcam, Wi-Fi &amp; Bluetooth, Windows 11 Pro, Blue
+Options:
+4 capacities
+2
+$399
+00
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.344377" elapsed="0.039916"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_328")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.343532" elapsed="0.041503"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.426856" level="INFO">Laptop Computer, 16GB DDR4 512GB SSD, Quad-Core Intel N95 Processor, Windows 11 Laptop, 15.6" IPS 1080P PC, Metal Shell, WiFi, BT5.0, USB3.2, Type_C, Long Battery Life, 180° Open Angle
+10
+50+ bought in past month
+Limited time deal
+$359
+99 Typical:
+$1,299.99
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.387155" elapsed="0.040598"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_329")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.386176" elapsed="0.042314"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.473772" level="INFO">Overall Pick
+
+
+Newest 14" HD Light Thin Laptop Student Business, Quad-Core Intel N4120, 4GB RAM, 128GB (64GB eMMC+ 64GB SD), Webcam, Wi-Fi, Long Battery, Windows 11S + 1 Year Office 365+MarxsolAccessory Rose Gold
+Options:
+3 capacities
+57
+$229
+00
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.430924" elapsed="0.043737"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_330")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.429624" elapsed="0.045782"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.523724" level="INFO">Sponsored
+15.6” Galaxy Book3 Laptop PC Computer, 13th Gen Intel Core i7-1355U Processor / 16 GB / 512GB, Thin and Light, FHD Screen, Fingerprint Reader, HD Webcam, 2023 Model, NP750XFG-KB2US, Silver
+Options:
+4 capacities
+164
+100+ bought in past month
+$799
+99 List:
+$999.99
+Delivery Thu, Feb 22
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.477775" elapsed="0.046514"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_331")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.476532" elapsed="0.048530"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.561698" level="INFO">V15 Laptop, 15.6" FHD Display, AMD Ryzen 5 5500U Hexa-core Processor (Beat Intel i7-1065G7), 16GB RAM, 1TB SSD, HDMI, RJ45, Numeric Keypad, Wi-Fi, Windows 11 Pro, Black
+Options:
+6 capacities
+93
+500+ bought in past month
+$475
+00
+Ships to India
+Only 10 left in stock - order soon.</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.527561" elapsed="0.035043"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_332")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.526609" elapsed="0.036767"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.599364" level="INFO">jumper Laptop, 16 Inch FHD IPS 16:10 Screen, Intel Celeron Quad Core CPU, 4GB LPDDR4 RAM 128GB Storage, Laptops Computer, Office 365 1-Year Subscription, 4 Stereo Speakers, Numeric Keypad.
+29
+300+ bought in past month
+Limited time deal
+$229
+90 Typical:
+$999.99
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.565737" elapsed="0.034592"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_333")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.564503" elapsed="0.036678"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.635972" level="INFO">Newest 15 Laptop, Intel Core i3-1215U 6-Core Processor, 32GB Memory, 1TB Storage, 15.6" FHD Display, Fingerprint Reader, SD Card Reader, Windows 11 Home S, Bundled 250GB Portable SSD
+20
+100+ bought in past month
+$479
+00
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.603056" elapsed="0.033554"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_334")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.602289" elapsed="0.034807"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.674458" level="INFO">Newest 15.6'' Anti-Glare HD Laptop, Intel Quad-core Processor, 16GB RAM, 128GB SSD+ 512GB JVQ USB Storage, Office 365 1-Year, Up to 11 hrs Long Battery, Windows 11 S, Scarlet Red
+Options:
+4 capacities
+105
+100+ bought in past month
+$379
+99
+Save $30.00 with coupon
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.638719" elapsed="0.036408"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_335")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.637802" elapsed="0.037702"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.717332" level="INFO">Sponsored
+ASUS Chromebook CM14 Laptop, 14" HD Anti-Glare Display (1366x768), MediaTek Kompanio 520, 4GB RAM, 64GB eMMC, ChromeOS, Gray, CM1402CM2A-DS44, Gravity Grey
+897
+500+ bought in past month
+$199
+99 List:
+$279.99
+Delivery Tue, Feb 20
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.676763" elapsed="0.041116"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_336")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.676106" elapsed="0.042150"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.756856" level="INFO">Dell Inspiron 3000 Series Laptop, 15.6" FHD Touchscreen, Intel Core i5-1135G7, 16GB DDR4 RAM, 1TB Storage(512GB SSD+500GB HDD), Webcam, SD Card Reader, Wi-Fi, Windows 11 Home, Black
+220
+100+ bought in past month
+$489
+00
+Ships to India
+Only 12 left in stock - order soon.
+More Buying Choices
+$399.00(12 used &amp; new offers)</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.719581" elapsed="0.037823"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_337")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.718910" elapsed="0.038871"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.803318" level="INFO">16.1“ Gaming Laptop, AMD Ryzen 7 5700U(Beats i7-1265U) Laptop Computer with 16GB DDR4 512GB NVMe SSD, Radeon RX Vega 8 Graphics, BT5.2, USB_C, 53Wh Battery, WiFi 6, Backlit KB
+3
+50+ bought in past month
+Limited time deal
+$499
+99 List:
+$599.99
+Save $30.00 with coupon
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.759415" elapsed="0.044461"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_338")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.758605" elapsed="0.045645"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.841272" level="INFO">Dell Newest Inspiron 15 Business Laptop, 15.6" FHD Touchscreen, AMD Ryzen 5-7530U (Up tp 4.5GHz), 1TB PCIE SSD, 16GB RAM, AMD Radeon Graphics, Wi-Fi, Webcam, Windows 11 Home
+Options:
+3 capacities
+2
+$499
+00
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.805541" elapsed="0.036912"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_339")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.804871" elapsed="0.038540"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.889621" level="INFO">Popular Brand Pick
+
+
+Acer Aspire 3 A314-23P-R3QA Slim Laptop | 14.0" Full HD IPS Display | AMD Ryzen 5 7520U Quad-Core Processor | AMD Radeon Graphics | 8GB LPDDR5 | 512GB NVMe SSD | Wi-Fi 6 | Windows 11 Home,Silver
+287
+500+ bought in past month
+$396
+00 List:
+$449.99
+Delivery Tue, Feb 20
+Ships to India
+More Buying Choices
+$364.32(35 used &amp; new offers)</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.846488" elapsed="0.043712"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_340")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.844926" elapsed="0.045654"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.945770" level="INFO">Sponsored
+IdeaPad 2023 Flagship 14'' HD Screen Lightweight Laptop, 4-Core Intel Pentium N5030 (Upto 3.1GHz), 4GB RAM, 128GB eMMC,WiFi, Webcam, Long Battery Hours, Microsoft 365, Win 11S+HubxcelAccessory
+36
+$239
+00
+Save 5% with coupon
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.891892" elapsed="0.055219"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_341")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.891226" elapsed="0.057089"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:27.996915" level="INFO">15.6'' Laptop Computer, 8GB RAM Laptop, 256GB SSD, 1366 * 768 IPS Display, Intel Celeron N5095 Processors, 5000mWh Battery, USB 3.0, Bluetooth 4.2, 2.4/5G WiFi
+44
+50+ bought in past month
+Limited time deal
+$199
+99 List:
+$349.99
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:27.951459" elapsed="0.046670"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_342")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.949783" elapsed="0.049101"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:28.039773" level="INFO">Victus 15 Gaming Laptop, 15.6" FHD 144Hz Display, AMD Ryzen 5 7535HS, 16GB DDR5 RAM, 1TB PCIe M.2 SSD, NVIDIA GeForce RTX 2050, HDMI, Webcam, Backlit Keyboard, Wi-Fi 6, Windows 11 Home, Silver
+Options:
+4 capacities
+160
+500+ bought in past month
+$628
+00 List:
+$929.00
+Ships to India
+Only 5 left in stock - order soon.
+More Buying Choices
+$609.00(50 used &amp; new offers)</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.000218" elapsed="0.040456"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_343")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:27.999523" elapsed="0.041876"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:28.080798" level="INFO">ASUS Chromebook CM14 Laptop, 14" HD Anti-Glare Display (1366x768), MediaTek Kompanio 520, 4GB RAM, 64GB eMMC, ChromeOS, Gray, CM1402CM2A-DS44, Gravity Grey
+897
+500+ bought in past month
+$199
+99 List:
+$279.99
+Delivery Tue, Feb 20
+Ships to India
+More Buying Choices
+$147.93(23 used &amp; new offers)</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.043886" elapsed="0.037482"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_344")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:28.042577" elapsed="0.039184"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:28.117319" level="INFO">Victus 15 Gaming Laptop 15.6" FHD IPS 144Hz AMD 7000 Ryzen 5 7535HS (Beats i7-11800H) GeForce RTX 2050 4GB Graphic Backlit USB-C B&amp;O Win11 Black + HDMI Cable (8GB RAM | 512GB PCIe SSD)
+2
+50+ bought in past month
+$580
+00
+Ships to India
+Only 3 left in stock - order soon.
+More Buying Choices
+$519.00(19 used &amp; new offers)</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.083085" elapsed="0.035132"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_345")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:28.082390" elapsed="0.036524"/>
+</iter>
+<iter>
+<kw name="Log Many" owner="BuiltIn">
+<msg time="2024-02-01T16:34:28.156826" level="INFO">Sponsored
+15.6" Laptop 16GB RAM 1TB NVMe SSD, 12th Intel Alder Lake-N100 (4C/4T, up to 3.4GHz) FHD IPS Display (1080P)/Full-Function Type-C/Gigabit Ethernet/WiFi6/BT5.0/Windows 11 Pro Notebook Computer
+20
+50+ bought in past month
+$369
+99
+Ships to India</msg>
+<arg>${product.text}</arg>
+<doc>Logs the given messages as separate entries using the INFO level.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.120193" elapsed="0.037641"/>
+</kw>
+<var name="${product}">&lt;selenium.webdriver.remote.webelement.WebElement (session="cb4309cb10c947068f0f139caf49ea6f", element="D44BCBD2B8ADEB4E19A6FBE235B43C40_element_346")&gt;</var>
+<status status="PASS" start="2024-02-01T16:34:28.119525" elapsed="0.039160"/>
+</iter>
+<var>${product}</var>
+<value>@{product_details}</value>
+<status status="PASS" start="2024-02-01T16:34:27.030632" elapsed="1.128878"/>
+</for>
+<kw name="Save Names To CSV">
+<for flavor="IN RANGE">
+<iter>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:28.233473" level="INFO">${name} = jumper Laptop, 12th Quad-Core Intel N100(Up to 3.4G), 16GB DDR5 512GB SSD, Laptops Computer with 16" FHD IPS Screen(1920X1200), 38Wh Battery, Cooling System, 2.4G/5G WiFi, BT4.0, Type-C, HD Webcam.</msg>
+<var>${name}</var>
+<arg>//*[@data-cel-widget="search_result_${index}"] //h2[starts-with(@class,'a-size-mini a-spacing-none a-color-base s-line-clamp-2')]</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.179051" elapsed="0.055233"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:28.267919" level="INFO">${price} = $379
+99</msg>
+<var>${price}</var>
+<arg>//*[@data-cel-widget="search_result_${index}"] //span[@class='a-price']</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.235732" elapsed="0.032969"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:28.298874" level="INFO">${rating} = </msg>
+<var>${rating}</var>
+<arg>//*[@data-cel-widget="search_result_${index}"] //span[@class='a-icon-alt']</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.270060" elapsed="0.029269"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:28.330524" level="INFO">${shipping} = Ships to India</msg>
+<var>${shipping}</var>
+<arg>//*[@data-cel-widget="search_result_${index}"] //div[@data-cy="delivery-recipe"]</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.300023" elapsed="0.031239"/>
+</kw>
+<kw name="Append To File" owner="OperatingSystem">
+<msg time="2024-02-01T16:34:28.335901" level="INFO" html="true">Appended to file '&lt;a href="file:///home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv"&gt;/home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv&lt;/a&gt;'.</msg>
+<arg>${file_name}</arg>
+<arg>${name}${\n} ,${price}${\n}</arg>
+<doc>Appends the given content to the specified file.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.332549" elapsed="0.004744"/>
+</kw>
+<kw name="Append To File" owner="OperatingSystem">
+<msg time="2024-02-01T16:34:28.343884" level="INFO" html="true">Appended to file '&lt;a href="file:///home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv"&gt;/home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv&lt;/a&gt;'.</msg>
+<arg>${file_name}</arg>
+<arg>${rating}</arg>
+<doc>Appends the given content to the specified file.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.339022" elapsed="0.005812"/>
+</kw>
+<kw name="Append To File" owner="OperatingSystem">
+<msg time="2024-02-01T16:34:28.349888" level="INFO" html="true">Appended to file '&lt;a href="file:///home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv"&gt;/home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv&lt;/a&gt;'.</msg>
+<arg>${file_name}</arg>
+<arg>${shipping}${\n}</arg>
+<doc>Appends the given content to the specified file.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.346534" elapsed="0.004726"/>
+</kw>
+<kw name="Append To File" owner="OperatingSystem">
+<msg time="2024-02-01T16:34:28.356731" level="INFO" html="true">Appended to file '&lt;a href="file:///home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv"&gt;/home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv&lt;/a&gt;'.</msg>
+<arg>${file_name}</arg>
+<arg>${\n}</arg>
+<doc>Appends the given content to the specified file.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.352793" elapsed="0.005223"/>
+</kw>
+<var name="${index}">3</var>
+<status status="PASS" start="2024-02-01T16:34:28.176592" elapsed="0.182431"/>
+</iter>
+<iter>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:28.405936" level="INFO">${name} = ASUS Vivobook Go 12 L210 11.6” ultra-thin laptop, 2022 version, Intel Celeron N4020, 4GB RAM, 64GB eMMC, Win 11 Home in S mode with One Year of Office 365 Personal, L210MA-DS02</msg>
+<var>${name}</var>
+<arg>//*[@data-cel-widget="search_result_${index}"] //h2[starts-with(@class,'a-size-mini a-spacing-none a-color-base s-line-clamp-2')]</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.363520" elapsed="0.043044"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:28.456317" level="INFO">${price} = $169
+99</msg>
+<var>${price}</var>
+<arg>//*[@data-cel-widget="search_result_${index}"] //span[@class='a-price']</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.407400" elapsed="0.049710"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:28.531480" level="INFO">${rating} = </msg>
+<var>${rating}</var>
+<arg>//*[@data-cel-widget="search_result_${index}"] //span[@class='a-icon-alt']</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.458630" elapsed="0.074033"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:28.639694" level="INFO">${shipping} = Delivery Wed, Feb 21
+Ships to India</msg>
+<var>${shipping}</var>
+<arg>//*[@data-cel-widget="search_result_${index}"] //div[@data-cy="delivery-recipe"]</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.535898" elapsed="0.104997"/>
+</kw>
+<kw name="Append To File" owner="OperatingSystem">
+<msg time="2024-02-01T16:34:28.648214" level="INFO" html="true">Appended to file '&lt;a href="file:///home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv"&gt;/home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv&lt;/a&gt;'.</msg>
+<arg>${file_name}</arg>
+<arg>${name}${\n} ,${price}${\n}</arg>
+<doc>Appends the given content to the specified file.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.642734" elapsed="0.006687"/>
+</kw>
+<kw name="Append To File" owner="OperatingSystem">
+<msg time="2024-02-01T16:34:28.660510" level="INFO" html="true">Appended to file '&lt;a href="file:///home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv"&gt;/home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv&lt;/a&gt;'.</msg>
+<arg>${file_name}</arg>
+<arg>${rating}</arg>
+<doc>Appends the given content to the specified file.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.653357" elapsed="0.008936"/>
+</kw>
+<kw name="Append To File" owner="OperatingSystem">
+<msg time="2024-02-01T16:34:28.674715" level="INFO" html="true">Appended to file '&lt;a href="file:///home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv"&gt;/home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv&lt;/a&gt;'.</msg>
+<arg>${file_name}</arg>
+<arg>${shipping}${\n}</arg>
+<doc>Appends the given content to the specified file.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.664562" elapsed="0.011446"/>
+</kw>
+<kw name="Append To File" owner="OperatingSystem">
+<msg time="2024-02-01T16:34:28.681214" level="INFO" html="true">Appended to file '&lt;a href="file:///home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv"&gt;/home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv&lt;/a&gt;'.</msg>
+<arg>${file_name}</arg>
+<arg>${\n}</arg>
+<doc>Appends the given content to the specified file.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.677365" elapsed="0.004965"/>
+</kw>
+<var name="${index}">4</var>
+<status status="PASS" start="2024-02-01T16:34:28.361189" elapsed="0.322132"/>
+</iter>
+<iter>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:28.916282" level="INFO">${name} = IdeaPad 1 15.6" FHD Laptop, 12th Gen Intel Core i3-1215U 6-Core Processor, 16GB DDR4 Memory, 1TB PCIe SSD, SD Card Reader, HDMI, Webcam, Wi-Fi &amp; Bluetooth, Windows 11 Pro, Blue</msg>
+<var>${name}</var>
+<arg>//*[@data-cel-widget="search_result_${index}"] //h2[starts-with(@class,'a-size-mini a-spacing-none a-color-base s-line-clamp-2')]</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.686612" elapsed="0.230476"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:28.976173" level="INFO">${price} = $399
+00</msg>
+<var>${price}</var>
+<arg>//*[@data-cel-widget="search_result_${index}"] //span[@class='a-price']</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.918935" elapsed="0.058134"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:29.031827" level="INFO">${rating} = </msg>
+<var>${rating}</var>
+<arg>//*[@data-cel-widget="search_result_${index}"] //span[@class='a-icon-alt']</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:28.978720" elapsed="0.053962"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2024-02-01T16:34:29.080178" level="INFO">${shipping} = Ships to India</msg>
+<var>${shipping}</var>
+<arg>//*[@data-cel-widget="search_result_${index}"] //div[@data-cy="delivery-recipe"]</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2024-02-01T16:34:29.034301" elapsed="0.046881"/>
+</kw>
+<kw name="Append To File" owner="OperatingSystem">
+<msg time="2024-02-01T16:34:29.096458" level="INFO" html="true">Appended to file '&lt;a href="file:///home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv"&gt;/home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv&lt;/a&gt;'.</msg>
+<arg>${file_name}</arg>
+<arg>${name}${\n} ,${price}${\n}</arg>
+<doc>Appends the given content to the specified file.</doc>
+<status status="PASS" start="2024-02-01T16:34:29.083381" elapsed="0.038712"/>
+</kw>
+<kw name="Append To File" owner="OperatingSystem">
+<msg time="2024-02-01T16:34:29.146750" level="INFO" html="true">Appended to file '&lt;a href="file:///home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv"&gt;/home/drashti/Documents/Android_Automation/robot-files/Web_Automation/output.csv&lt;/a&gt;'.</msg>
+<arg>${file_name}</arg>
+<arg>${rating}</arg>
+<doc>Appends the given content to the specified file.</doc>
+<status status="PASS" start="2024-02-01T16:34:29.129366" elapsed="0.018630"/>
+</kw>
+<kw name="Append To File" owner="OperatingSystem">
+<msg time="2024-02-01T16:34:29.155381" level="INFO" html="true">
