@@ -1,0 +1,5 @@
+str1= input("Num1: ")
+str2= input("Num2: ")
+x=int(str1)
+y=int(str2)
+print(x+y)
